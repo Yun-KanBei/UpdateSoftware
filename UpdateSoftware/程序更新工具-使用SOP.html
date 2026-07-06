@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>程序更新工具 V2.0 · 使用SOP</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    color: #333;
+    background: #f5f6f8;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 44px 60px;
+    background: #fff;
+    min-height: 100vh;
+  }
+  /* 标题区 */
+  .doc-header { border-bottom: 3px solid #0078d4; padding-bottom: 18px; margin-bottom: 28px; }
+  .doc-header h1 { font-size: 26px; color: #1a1a1a; font-weight: 700; }
+  .doc-header .subtitle { color: #666; font-size: 14px; margin-top: 6px; }
+  .badge {
+    display: inline-block; background: #0078d4; color: #fff;
+    font-size: 12px; padding: 2px 10px; border-radius: 10px;
+    margin-left: 8px; vertical-align: middle; font-weight: 600;
+  }
+  .intro { background: #eef4fb; border-left: 4px solid #0078d4; padding: 12px 16px; border-radius: 0 6px 6px 0; margin-bottom: 30px; font-size: 14px; color: #444; }
+
+  /* 章节 */
+  h2 { font-size: 19px; color: #1a1a1a; margin: 32px 0 14px; padding-left: 12px; border-left: 4px solid #0078d4; }
+  h3 { font-size: 15px; color: #222; margin: 20px 0 10px; }
+
+  /* 步骤卡片 */
+  .step { margin-bottom: 26px; }
+  .step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .step-num {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: #0078d4; color: #fff; font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+  .step-desc { font-size: 14px; color: #444; margin: 0 0 12px 38px; }
+  .step-desc .key { color: #c0392b; font-weight: 600; }
+
+  /* SVG 容器 */
+  .fig { margin: 0 0 8px 38px; border: 1px solid #e2e4e8; border-radius: 8px; overflow: hidden; background: #fafbfc; }
+  .fig svg { display: block; width: 100%; height: auto; }
+  .fig-cap { font-size: 12px; color: #888; margin: 0 0 0 38px; padding: 4px 0 0; }
+
+  /* 提示框 */
+  .tip { font-size: 13px; color: #555; background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; padding: 8px 12px; margin: 8px 0 0 38px; }
+  .tip::before { content: "💡 "; }
+
+  /* 流程总览 */
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 24px; }
+  .flow-item { background: #eef4fb; border: 1px solid #b3d4f0; border-radius: 6px; padding: 6px 12px; font-size: 13px; color: #14507a; font-weight: 500; }
+  .flow-arrow { color: #0078d4; font-weight: 700; }
+
+  /* 常见问题 */
+  .faq { margin: 0 0 0 38px; }
+  .faq-item { font-size: 13.5px; margin-bottom: 8px; padding-left: 18px; position: relative; }
+  .faq-item::before { content: "▸"; color: #fd7e14; position: absolute; left: 0; font-weight: 700; }
+  .faq-item .q { font-weight: 600; color: #222; }
+
+  /* 表格 */
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 0 38px; font-size: 13px; }
+  th, td { border: 1px solid #dfe2e6; padding: 6px 10px; text-align: left; }
+  th { background: #f0f2f5; font-weight: 600; }
+  .color-green { color: #28a745; font-weight: 600; }
+  .color-red { color: #e63946; font-weight: 600; }
+  .color-gray { color: #999; }
+
+  /* 页脚 */
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e2e4e8; font-size: 12px; color: #999; text-align: center; }
+
+  @media print {
+    body { background: #fff; }
+    .page { max-width: 100%; padding: 20px; }
+    .fig { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== 标题 ===== -->
+  <div class="doc-header">
+    <h1>程序更新工具 V2.0 · 使用 SOP<span class="badge">EXE版本管理</span></h1>
+    <div class="subtitle">适用范围：工控机工位 EXE 程序版本扫描 / 匹配 / 批量更新 · 内部工具操作手册</div>
+  </div>
+
+  <div class="intro">
+    本工具用于统一管理工控机各工位的 EXE 程序版本：可扫描当前版本、对比新旧版本、一键批量更新。日常推荐使用「智能操作」页完成更新，仅需 <b>3 步</b>。
+  </div>
+
+  <!-- ===== 流程总览 ===== -->
+  <h2>操作流程总览</h2>
+  <div class="flow">
+    <span class="flow-item">① 登录</span><span class="flow-arrow">→</span>
+    <span class="flow-item">② 参数设定（首次）</span><span class="flow-arrow">→</span>
+    <span class="flow-item">③ 设置新版本路径</span><span class="flow-arrow">→</span>
+    <span class="flow-item">④ 一键扫描</span><span class="flow-arrow">→</span>
+    <span class="flow-item">⑤ 一键更新</span><span class="flow-arrow">→</span>
+    <span class="flow-item">⑥ 监听模式（可选）</span>
+  </div>
+
+  <!-- ===== 界面总览 ===== -->
+  <h2>一、界面总览</h2>
+  <div class="step-desc">主窗口为<b>三栏式布局</b>：顶部工具栏 + 左侧目录树 + 右侧四个功能 Tab 页。</div>
+  <div class="fig">
+    <svg viewBox="0 0 800 470" xmlns="http://www.w3.org/2000/svg">
+      <!-- 背景 -->
+      <rect x="0" y="0" width="800" height="470" fill="#ffffff" stroke="#999" stroke-width="1.5" rx="6"/>
+
+      <!-- 顶部工具栏 -->
+      <rect x="0" y="0" width="800" height="44" fill="#f0f2f5" stroke="#ccc" stroke-width="1"/>
+      <text x="12" y="28" font-size="13" font-weight="700" fill="#0078d4">EXE版本管理工具</text>
+      <rect x="135" y="11" width="40" height="22" rx="4" fill="#fff" stroke="#ccc"/><text x="155" y="26" font-size="11" fill="#666" text-anchor="middle">换肤</text>
+      <text x="200" y="28" font-size="12" font-weight="600" fill="#fd7e14">用户名</text>
+      <rect x="270" y="11" width="90" height="22" rx="3" fill="#fff" stroke="#ccc"/><text x="278" y="26" font-size="10" fill="#999">设备号</text>
+      <rect x="365" y="13" width="13" height="13" rx="2" fill="#fff" stroke="#999"/><text x="383" y="25" font-size="10" fill="#666">启用</text>
+      <rect x="430" y="11" width="62" height="22" rx="4" fill="#ff4500"/><text x="461" y="26" font-size="10" fill="#fff" text-anchor="middle">身份验证</text>
+      <rect x="498" y="11" width="56" height="22" rx="4" fill="#28a745"/><text x="526" y="26" font-size="10" fill="#fff" text-anchor="middle">保存参数</text>
+      <rect x="560" y="11" width="52" height="22" rx="4" fill="#fff" stroke="#ccc"/><text x="586" y="26" font-size="10" fill="#666" text-anchor="middle">读取配置</text>
+      <rect x="618" y="11" width="80" height="22" rx="4" fill="#fd7e14"/><text x="658" y="26" font-size="9" fill="#fff" text-anchor="middle">创建快捷方式</text>
+      <rect x="704" y="11" width="86" height="22" rx="4" fill="#fd7e14"/><text x="747" y="26" font-size="9" fill="#fff" text-anchor="middle">按规则命名文件夹</text>
+
+      <!-- 左栏 -->
+      <rect x="0" y="44" width="200" height="426" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <text x="10" y="62" font-size="12" font-weight="700" fill="#333">程序目录结构</text>
+      <rect x="10" y="70" width="80" height="16" rx="8" fill="#eef4fb" stroke="#b3d4f0"/><circle cx="20" cy="78" r="3" fill="#0078d4"/><text x="50" y="82" font-size="9" fill="#14507a">本机地址</text>
+      <rect x="95" y="70" width="95" height="16" rx="8" fill="#fff" stroke="#ccc"/><circle cx="105" cy="78" r="3" fill="none" stroke="#999"/><text x="142" y="82" font-size="9" fill="#666">非本机地址</text>
+      <rect x="10" y="92" width="140" height="18" rx="3" fill="#fff" stroke="#ccc"/><text x="14" y="105" font-size="9" fill="#999">路径...</text>
+      <rect x="155" y="92" width="35" height="18" rx="3" fill="#fff" stroke="#ccc"/><text x="172" y="105" font-size="9" fill="#666" text-anchor="middle">浏览</text>
+      <!-- 目录树 -->
+      <rect x="10" y="118" width="180" height="180" fill="#fafbfc" stroke="#e2e4e8" rx="3"/>
+      <text x="18" y="134" font-size="10" fill="#333">📂 根目录</text>
+      <text x="28" y="150" font-size="10" fill="#555">📂 工位A#</text>
+      <text x="38" y="166" font-size="10" fill="#28a745">  📄 App.exe V2.1</text>
+      <text x="28" y="182" font-size="10" fill="#555">📂 工位B#</text>
+      <text x="38" y="198" font-size="10" fill="#e63946">  📄 App.exe V1.8</text>
+      <text x="28" y="214" font-size="10" fill="#555">📂 工位C#</text>
+      <text x="38" y="230" font-size="10" fill="#999">  📄 App.exe —</text>
+      <!-- 选中文件信息 -->
+      <line x1="10" y1="308" x2="190" y2="308" stroke="#e2e4e8"/>
+      <text x="10" y="324" font-size="9" fill="#888">选中文件信息</text>
+      <text x="10" y="340" font-size="9" fill="#555">EXE: App.exe</text>
+      <text x="10" y="354" font-size="9" fill="#555">版本: V2.1</text>
+      <text x="10" y="368" font-size="9" fill="#555">修改: 2026-07-01</text>
+      <text x="10" y="382" font-size="9" fill="#555">文件夹: 工位A#</text>
+      <text x="10" y="396" font-size="8" fill="#888">路径: W:\...\工位A#</text>
+
+      <!-- 右栏 Tab 栏 -->
+      <rect x="200" y="44" width="600" height="30" fill="#f0f2f5"/>
+      <rect x="208" y="48" width="76" height="22" rx="3" fill="#fff" stroke="#ccc"/><text x="246" y="63" font-size="11" fill="#666" text-anchor="middle">程序扫描</text>
+      <rect x="288" y="48" width="76" height="22" rx="3" fill="#fff" stroke="#ccc"/><text x="326" y="63" font-size="11" fill="#666" text-anchor="middle">程序匹配</text>
+      <rect x="368" y="48" width="76" height="22" rx="3" fill="#fff" stroke="#ccc"/><text x="406" y="63" font-size="11" fill="#666" text-anchor="middle">参数设定</text>
+      <rect x="448" y="48" width="86" height="22" rx="3" fill="#0078d4"/><text x="491" y="63" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">智能操作 ★</text>
+
+      <!-- 右栏内容区 -->
+      <rect x="200" y="74" width="600" height="396" fill="#fff" stroke="#ccc" stroke-width="1"/>
+      <text x="216" y="98" font-size="11" font-weight="600" fill="#333">新版本统一存放路径</text>
+      <rect x="216" y="104" width="380" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="222" y="118" font-size="9" fill="#999">选择外层总目录，自动搜索子文件夹内 EXE</text>
+      <rect x="602" y="104" width="44" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="624" y="118" font-size="9" fill="#666" text-anchor="middle">浏览</text>
+      <rect x="216" y="132" width="200" height="14" rx="2" fill="#fff" stroke="#ccc"/><text x="220" y="143" font-size="8" fill="#28a745">☑ 更新完成后自动创建快捷方式</text>
+      <rect x="216" y="152" width="180" height="16" rx="8" fill="#eef4fb" stroke="#b3d4f0"/><circle cx="226" cy="160" r="3" fill="#0078d4"/><text x="266" y="164" font-size="9" fill="#14507a">远程(参数配置表路径)</text>
+      <rect x="400" y="152" width="100" height="16" rx="8" fill="#fff" stroke="#ccc"/><circle cx="410" cy="160" r="3" fill="none" stroke="#999"/><text x="450" y="164" font-size="9" fill="#666">本机测试</text>
+      <rect x="216" y="178" width="120" height="26" rx="5" fill="#28a745"/><text x="276" y="195" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">一键扫描所有工位</text>
+      <rect x="342" y="178" width="140" height="26" rx="5" fill="#e9ecef" stroke="#ccc"/><text x="412" y="195" font-size="10" fill="#999" text-anchor="middle">一键更新所有过期工位</text>
+      <!-- 结果表 -->
+      <text x="216" y="226" font-size="10" fill="#888">扫描结果（绿=最新 红=可更新 灰=未检测到新版本）</text>
+      <rect x="216" y="232" width="568" height="20" fill="#f0f2f5" stroke="#dfe2e6"/>
+      <text x="222" y="246" font-size="9" fill="#555">选择</text><text x="252" y="246" font-size="9" fill="#555">工位</text><text x="320" y="246" font-size="9" fill="#555">EXE程序</text><text x="430" y="246" font-size="9" fill="#555">当前版本</text><text x="500" y="246" font-size="9" fill="#555">新版本</text><text x="560" y="246" font-size="9" fill="#555">状态</text><text x="640" y="246" font-size="9" fill="#555">待更新位置</text>
+      <rect x="216" y="252" width="568" height="18" fill="#fff" stroke="#dfe2e6"/><text x="252" y="265" font-size="9" fill="#333">工位A#</text><text x="320" y="265" font-size="9" fill="#333">App.exe</text><text x="430" y="265" font-size="9" fill="#333">V2.1</text><text x="500" y="265" font-size="9" fill="#333">V2.1</text><text x="560" y="265" font-size="9" fill="#28a745" font-weight="600">最新</text>
+      <rect x="216" y="270" width="568" height="18" fill="#fff" stroke="#dfe2e6"/><text x="252" y="283" font-size="9" fill="#333">工位B#</text><text x="320" y="283" font-size="9" fill="#333">App.exe</text><text x="430" y="283" font-size="9" fill="#333">V1.8</text><text x="500" y="283" font-size="9" fill="#333">V2.1</text><text x="560" y="283" font-size="9" fill="#e63946" font-weight="600">可更新</text>
+      <rect x="216" y="288" width="568" height="18" fill="#fff" stroke="#dfe2e6"/><text x="252" y="301" font-size="9" fill="#333">工位C#</text><text x="320" y="301" font-size="9" fill="#333">App.exe</text><text x="430" y="301" font-size="9" fill="#333">V2.0</text><text x="500" y="301" font-size="9" fill="#999">—</text><text x="560" y="301" font-size="9" fill="#999">未检测到</text>
+
+      <!-- 标注 -->
+      <circle cx="430" cy="22" r="11" fill="#e63946"/><text x="430" y="27" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+      <line x1="441" y1="22" x2="470" y2="-2" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="472" y="-4" font-size="10" fill="#e63946" font-weight="600">①顶部工具栏</text>
+
+      <circle cx="100" cy="160" r="11" fill="#e63946"/><text x="100" y="165" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+      <line x1="100" y1="149" x2="100" y2="120" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="60" y="112" font-size="10" fill="#e63946" font-weight="600">②程序目录树</text>
+
+      <circle cx="491" cy="74" r="11" fill="#e63946"/><text x="491" y="79" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">3</text>
+      <line x1="502" y1="74" x2="540" y2="58" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="544" y="56" font-size="10" fill="#e63946" font-weight="600">③四个功能Tab</text>
+
+      <circle cx="276" cy="178" r="11" fill="#e63946"/><text x="276" y="183" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">4</text>
+      <line x1="287" y1="178" x2="340" y2="158" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="344" y="156" font-size="10" fill="#e63946" font-weight="600">④智能操作主功能区</text>
+    </svg>
+  </div>
+  <div class="fig-cap">图1 · 主界面三栏式布局总览（默认显示「智能操作」Tab）</div>
+
+  <!-- ===== 核心操作步骤 ===== -->
+  <h2>二、核心操作步骤（日常使用）</h2>
+
+  <!-- Step 1 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num">1</div>
+      <div class="step-title">首次启动 · 选择关闭行为</div>
+    </div>
+    <div class="step-desc">首次运行弹出设置对话框，选择窗口关闭时的行为。建议选<span class="key">「最小化到系统托盘」</span>（蓝色按钮），后续可在「参数设定」中修改。</div>
+    <div class="fig">
+      <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="800" height="240" fill="#f5f6f8"/>
+        <!-- 遮罩背景 -->
+        <rect x="0" y="0" width="800" height="240" fill="#000" opacity="0.12"/>
+        <!-- 对话框 -->
+        <rect x="240" y="30" width="320" height="180" rx="8" fill="#fff" stroke="#ccc" stroke-width="1.5"/>
+        <rect x="240" y="30" width="320" height="36" rx="8" fill="#f0f2f5"/>
+        <rect x="240" y="58" width="320" height="8" fill="#f0f2f5"/>
+        <text x="400" y="54" font-size="14" font-weight="700" fill="#333" text-anchor="middle">首次运行设置</text>
+        <text x="400" y="92" font-size="12" fill="#555" text-anchor="middle">请选择窗口关闭时的行为：</text>
+        <!-- 按钮1 灰色 -->
+        <rect x="270" y="110" width="120" height="34" rx="6" fill="#e9ecef" stroke="#ccc"/>
+        <text x="330" y="132" font-size="12" fill="#999" text-anchor="middle">结束程序</text>
+        <!-- 按钮2 蓝色 -->
+        <rect x="410" y="110" width="120" height="34" rx="6" fill="#0078d4"/>
+        <text x="470" y="132" font-size="12" fill="#fff" text-anchor="middle" font-weight="600">最小化到系统托盘</text>
+        <!-- 提示 -->
+        <text x="400" y="168" font-size="10" fill="#888" text-anchor="middle">选择后可在「参数设定」页面随时更改</text>
+        <!-- 标注 -->
+        <circle cx="470" cy="110" r="12" fill="#e63946"/><text x="470" y="115" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+        <line x1="482" y1="110" x2="560" y2="92" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="564" y="90" font-size="11" fill="#e63946" font-weight="600">点击此按钮</text>
+        <text x="564" y="104" font-size="10" fill="#e63946">（推荐）</text>
+      </svg>
+    </div>
+    <div class="fig-cap">图2 · 首次运行设置对话框</div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num">2</div>
+      <div class="step-title">身份验证 · 登录</div>
+    </div>
+    <div class="step-desc">主窗口默认<span class="key">锁定</span>（半透明遮罩 + 橙色锁图标）。点击顶部<span class="key">「身份验证」</span>按钮（橙红色），输入用户名密码登录，遮罩消失即可操作。</div>
+    <div class="fig">
+      <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="800" height="300" fill="#fff" stroke="#999" rx="6"/>
+        <!-- 顶部工具栏 -->
+        <rect x="0" y="0" width="800" height="40" fill="#f0f2f5" stroke="#ccc"/>
+        <text x="12" y="26" font-size="13" font-weight="700" fill="#0078d4">EXE版本管理工具</text>
+        <rect x="430" y="9" width="62" height="22" rx="4" fill="#ff4500"/><text x="461" y="24" font-size="10" fill="#fff" text-anchor="middle">身份验证</text>
+        <!-- 内容区被遮罩 -->
+        <rect x="0" y="40" width="800" height="260" fill="#000" opacity="0.35"/>
+        <!-- 锁定提示 -->
+        <text x="400" y="120" font-size="42" fill="#fd7e14" text-anchor="middle">🔒</text>
+        <text x="400" y="155" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">页面已锁定</text>
+        <text x="400" y="180" font-size="12" fill="#eee" text-anchor="middle">请点击顶部「身份验证」按钮进行登录</text>
+        <!-- 登录对话框（右侧） -->
+        <rect x="500" y="60" width="260" height="180" rx="8" fill="#fff" stroke="#ccc" stroke-width="1.5"/>
+        <rect x="500" y="60" width="260" height="32" rx="8" fill="#f0f2f5"/>
+        <rect x="500" y="84" width="260" height="8" fill="#f0f2f5"/>
+        <text x="630" y="80" font-size="13" font-weight="700" fill="#333" text-anchor="middle">身份验证</text>
+        <text x="520" y="112" font-size="11" fill="#555">用户名</text>
+        <rect x="520" y="118" width="220" height="24" rx="3" fill="#fff" stroke="#ccc"/>
+        <text x="520" y="146" font-size="11" fill="#555">密码</text>
+        <rect x="520" y="152" width="220" height="24" rx="3" fill="#fff" stroke="#ccc"/>
+        <rect x="520" y="188" width="80" height="28" rx="5" fill="#0078d4"/><text x="560" y="206" font-size="12" fill="#fff" text-anchor="middle" font-weight="600">登录</text>
+        <rect x="612" y="188" width="80" height="28" rx="5" fill="#fff" stroke="#ccc"/><text x="652" y="206" font-size="12" fill="#666" text-anchor="middle">取消</text>
+        <!-- 标注 -->
+        <circle cx="461" cy="20" r="12" fill="#e63946"/><text x="461" y="25" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+        <line x1="461" y1="32" x2="461" y2="56" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="372" y="50" font-size="11" fill="#e63946" font-weight="600">①先点此按钮</text>
+        <circle cx="560" cy="188" r="12" fill="#e63946"/><text x="560" y="193" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+        <line x1="572" y1="188" x2="620" y2="168" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="624" y="166" font-size="11" fill="#e63946" font-weight="600">②输入后点登录</text>
+      </svg>
+    </div>
+    <div class="fig-cap">图3 · 锁定状态与身份验证登录</div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num">3</div>
+      <div class="step-title">参数设定（仅首次配置）</div>
+    </div>
+    <div class="step-desc">切换到<span class="key">「参数设定」</span>Tab，配置工位文件夹识别规则与 EXE 名称匹配规则。配置完成后点击顶部<span class="key">「保存参数」</span>，再点<span class="key">「读取配置」</span>生效。</div>
+    <div class="fig">
+      <svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="800" height="360" fill="#fff" stroke="#999" rx="6"/>
+        <!-- 顶部工具栏（简化） -->
+        <rect x="0" y="0" width="800" height="36" fill="#f0f2f5" stroke="#ccc"/>
+        <text x="12" y="24" font-size="12" font-weight="700" fill="#0078d4">EXE版本管理工具</text>
+        <rect x="498" y="8" width="56" height="22" rx="4" fill="#28a745"/><text x="526" y="23" font-size="10" fill="#fff" text-anchor="middle">保存参数</text>
+        <rect x="560" y="8" width="52" height="22" rx="4" fill="#fff" stroke="#ccc"/><text x="586" y="23" font-size="10" fill="#666" text-anchor="middle">读取配置</text>
+        <!-- Tab栏 -->
+        <rect x="0" y="36" width="800" height="28" fill="#f0f2f5"/>
+        <rect x="8" y="40" width="70" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="43" y="54" font-size="10" fill="#999" text-anchor="middle">程序扫描</text>
+        <rect x="82" y="40" width="70" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="117" y="54" font-size="10" fill="#999" text-anchor="middle">程序匹配</text>
+        <rect x="156" y="40" width="70" height="20" rx="3" fill="#0078d4"/><text x="191" y="54" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">参数设定</text>
+        <rect x="230" y="40" width="80" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="270" y="54" font-size="10" fill="#999" text-anchor="middle">智能操作</text>
+        <!-- 内容 -->
+        <text x="16" y="84" font-size="12" font-weight="600" fill="#333">程序文件夹识别规则</text>
+        <text x="16" y="100" font-size="10" fill="#888">选中文件夹内有下方表格中匹配的 exe 程序名称</text>
+        <!-- 规则表格 -->
+        <rect x="16" y="108" width="768" height="22" fill="#f0f2f5" stroke="#dfe2e6"/>
+        <text x="22" y="123" font-size="9" fill="#555">工位文件夹名称</text>
+        <text x="140" y="123" font-size="9" fill="#555">EXE名称(全匹配)</text>
+        <text x="250" y="123" font-size="9" fill="#555">文件夹命名</text>
+        <text x="360" y="123" font-size="9" fill="#555">快捷方式命名</text>
+        <text x="470" y="123" font-size="9" fill="#555">快捷方式地址</text>
+        <text x="580" y="123" font-size="9" fill="#555">远程账户</text>
+        <text x="650" y="123" font-size="9" fill="#555">远程密码</text>
+        <text x="715" y="123" font-size="9" fill="#555">访问地址</text>
+        <rect x="16" y="130" width="768" height="20" fill="#fff" stroke="#dfe2e6"/>
+        <text x="22" y="144" font-size="9" fill="#333">工位A#</text>
+        <text x="140" y="144" font-size="9" fill="#333">App.exe</text>
+        <text x="250" y="144" font-size="9" fill="#333">工位{版本号}</text>
+        <text x="360" y="144" font-size="9" fill="#333">App{版本号}</text>
+        <text x="470" y="144" font-size="9" fill="#999">...</text>
+        <text x="580" y="144" font-size="9" fill="#999">...</text>
+        <rect x="16" y="150" width="768" height="20" fill="#fafbfc" stroke="#dfe2e6"/>
+        <text x="22" y="164" font-size="9" fill="#888">工位B#</text>
+        <text x="140" y="164" font-size="9" fill="#888">App.exe</text>
+        <text x="250" y="164" font-size="9" fill="#888">工位{版本号}</text>
+        <text x="360" y="164" font-size="9" fill="#888">App{版本号}</text>
+        <!-- 路径配置 -->
+        <text x="16" y="196" font-size="11" font-weight="600" fill="#333">路径配置</text>
+        <text x="16" y="214" font-size="10" fill="#555">快捷方式创建地址：</text>
+        <rect x="140" y="202" width="500" height="18" rx="3" fill="#fff" stroke="#ccc"/><text x="146" y="215" font-size="9" fill="#999">D:\Shortcuts\</text>
+        <text x="16" y="238" font-size="10" fill="#555">日志文件目录：</text>
+        <rect x="140" y="226" width="500" height="18" rx="3" fill="#fff" stroke="#ccc"/><text x="146" y="239" font-size="9" fill="#999">D:\Logs\</text>
+        <text x="16" y="262" font-size="10" fill="#555">配置文件路径：</text>
+        <rect x="140" y="250" width="500" height="18" rx="3" fill="#fff" stroke="#ccc"/><text x="146" y="263" font-size="9" fill="#999">D:\Config\</text>
+        <!-- 关闭窗口设置 -->
+        <text x="16" y="296" font-size="11" font-weight="600" fill="#333">关闭窗口时设置</text>
+        <rect x="16" y="304" width="120" height="18" rx="9" fill="#eef4fb" stroke="#b3d4f0"/><circle cx="26" cy="313" r="3" fill="#0078d4"/><text x="66" y="316" font-size="9" fill="#14507a">结束程序</text>
+        <rect x="142" y="304" width="160" height="18" rx="9" fill="#fff" stroke="#ccc"/><circle cx="152" cy="313" r="3" fill="none" stroke="#999"/><text x="222" y="316" font-size="9" fill="#666">最小化到系统托盘</text>
+        <text x="320" y="316" font-size="9" fill="#888">占位符 {版本号} 运行时自动替换</text>
+        <!-- 标注 -->
+        <circle cx="191" cy="50" r="11" fill="#e63946"/><text x="191" y="55" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+        <line x1="202" y1="50" x2="250" y2="30" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="254" y="28" font-size="10" fill="#e63946" font-weight="600">①切到「参数设定」</text>
+        <circle cx="526" cy="19" r="11" fill="#e63946"/><text x="526" y="24" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+        <line x1="537" y1="19" x2="600" y2="4" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="604" y="8" font-size="10" fill="#e63946" font-weight="600">②保存→读取</text>
+        <circle cx="160" cy="140" r="11" fill="#e63946"/><text x="160" y="145" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">3</text>
+        <line x1="171" y1="140" x2="210" y2="120" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="214" y="118" font-size="10" fill="#e63946" font-weight="600">③填写识别规则</text>
+      </svg>
+    </div>
+    <div class="fig-cap">图4 · 参数设定页（首次配置工位规则与路径）</div>
+    <div class="tip">此步骤仅需在首次部署或工位规则变更时操作，日常更新无需重复配置。</div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num">4</div>
+      <div class="step-title">智能操作 · 设置路径并一键扫描</div>
+    </div>
+    <div class="step-desc">切换到<span class="key">「智能操作」</span>Tab（★推荐主流程）。设置<span class="key">新版本统一存放路径</span>（选外层总目录，自动搜索子文件夹 EXE），确认扫描模式为「远程」，点击<span class="key">「一键扫描所有工位」</span>。</div>
+    <div class="fig">
+      <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="800" height="300" fill="#fff" stroke="#999" rx="6"/>
+        <rect x="0" y="0" width="800" height="36" fill="#f0f2f5" stroke="#ccc"/>
+        <text x="12" y="24" font-size="12" font-weight="700" fill="#0078d4">EXE版本管理工具</text>
+        <!-- Tab栏 -->
+        <rect x="0" y="36" width="800" height="28" fill="#f0f2f5"/>
+        <rect x="8" y="40" width="70" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="43" y="54" font-size="10" fill="#999" text-anchor="middle">程序扫描</text>
+        <rect x="82" y="40" width="70" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="117" y="54" font-size="10" fill="#999" text-anchor="middle">程序匹配</text>
+        <rect x="156" y="40" width="70" height="20" rx="3" fill="#fff" stroke="#ccc"/><text x="191" y="54" font-size="10" fill="#999" text-anchor="middle">参数设定</text>
+        <rect x="230" y="40" width="80" height="20" rx="3" fill="#0078d4"/><text x="270" y="54" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">智能操作 ★</text>
+        <!-- 内容 -->
+        <text x="20" y="84" font-size="12" font-weight="600" fill="#333">新版本统一存放路径</text>
+        <rect x="20" y="90" width="560" height="24" rx="3" fill="#fff" stroke="#ccc"/><text x="28" y="107" font-size="10" fill="#999">D:\NewVersions\（选择外层总目录，自动搜索子文件夹内 EXE）</text>
+        <rect x="588" y="90" width="50" height="24" rx="4" fill="#fff" stroke="#ccc"/><text x="613" y="107" font-size="10" fill="#666" text-anchor="middle">浏览</text>
+        <rect x="20" y="122" width="240" height="16" rx="3" fill="#fff" stroke="#28a745"/><text x="26" y="134" font-size="9" fill="#28a745" font-weight="600">☑ 更新完成后自动创建快捷方式</text>
+        <text x="20" y="158" font-size="11" font-weight="600" fill="#333">扫描模式</text>
+        <rect x="20" y="164" width="220" height="20" rx="10" fill="#eef4fb" stroke="#b3d4f0"/><circle cx="32" cy="174" r="4" fill="#0078d4"/><text x="120" y="178" font-size="10" fill="#14507a">远程(使用参数配置表中的路径)</text>
+        <rect x="248" y="164" width="100" height="20" rx="10" fill="#fff" stroke="#ccc"/><circle cx="260" cy="174" r="4" fill="none" stroke="#999"/><text x="298" y="178" font-size="10" fill="#666">本机测试</text>
+        <text x="20" y="210" font-size="10" fill="#888">说明：选择外层总目录，系统会自动搜索其下所有子文件夹内的 EXE 文件</text>
+        <!-- 操作按钮 -->
+        <rect x="20" y="224" width="140" height="32" rx="6" fill="#28a745"/><text x="90" y="244" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">一键扫描所有工位</text>
+        <rect x="168" y="224" width="160" height="32" rx="6" fill="#e9ecef" stroke="#ccc"/><text x="248" y="244" font-size="11" fill="#adb5bd" text-anchor="middle">一键更新所有过期工位</text>
+        <text x="340" y="244" font-size="9" fill="#888">（扫描后启用）</text>
+        <!-- 标注 -->
+        <circle cx="40" y="90" r="0" fill="none"/>
+        <circle cx="300" cy="102" r="12" fill="#e63946"/><text x="300" y="107" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+        <line x1="312" y1="102" x2="360" y2="82" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="364" y="80" font-size="11" fill="#e63946" font-weight="600">①设置新版本路径</text>
+        <circle cx="90" cy="224" r="12" fill="#e63946"/><text x="90" y="229" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+        <line x1="90" y1="212" x2="90" y2="196" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="120" y="194" font-size="11" fill="#e63946" font-weight="600">②点击一键扫描</text>
+      </svg>
+    </div>
+    <div class="fig-cap">图5 · 智能操作页：设置路径 → 一键扫描</div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num">5</div>
+      <div class="step-title">智能操作 · 查看对比并一键更新</div>
+    </div>
+    <div class="step-desc">扫描完成后查看结果表格：<span class="color-green">绿色=最新</span>、<span class="color-red">红色=可更新</span>、<span class="color-gray">灰色=未检测到新版本</span>。确认后点击<span class="key">「一键更新所有过期工位」</span>（橙色，扫描后启用）完成批量更新。</div>
+    <div class="fig">
+      <svg viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="800" height="340" fill="#fff" stroke="#999" rx="6"/>
+        <rect x="0" y="0" width="800" height="36" fill="#f0f2f5" stroke="#ccc"/>
+        <text x="12" y="24" font-size="12" font-weight="700" fill="#0078d4">EXE版本管理工具</text>
+        <rect x="0" y="36" width="800" height="28" fill="#f0f2f5"/>
+        <rect x="230" y="40" width="80" height="20" rx="3" fill="#0078d4"/><text x="270" y="54" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">智能操作 ★</text>
+        <!-- 按钮区 -->
+        <rect x="20" y="76" width="140" height="30" rx="6" fill="#e9ecef" stroke="#ccc"/><text x="90" y="95" font-size="11" fill="#adb5bd" text-anchor="middle">一键扫描所有工位</text>
+        <rect x="168" y="76" width="170" height="30" rx="6" fill="#fd7e14"/><text x="253" y="95" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">一键更新所有过期工位</text>
+        <text x="350" y="95" font-size="9" fill="#28a745">● 已启用</text>
+        <!-- 结果表 -->
+        <text x="20" y="128" font-size="10" fill="#888">扫描结果</text>
+        <rect x="20" y="134" width="760" height="22" fill="#f0f2f5" stroke="#dfe2e6"/>
+        <text x="28" y="149" font-size="9" fill="#555">选择</text><text x="70" y="149" font-size="9" fill="#555">工位</text><text x="160" y="149" font-size="9" fill="#555">EXE程序</text><text x="300" y="149" font-size="9" fill="#555">当前版本(A)</text><text x="410" y="149" font-size="9" fill="#555">新版本(B)</text><text x="500" y="149" font-size="9" fill="#555">版本对比</text><text x="580" y="149" font-size="9" fill="#555">状态</text><text x="680" y="149" font-size="9" fill="#555">待更新位置</text>
+        <!-- 行1 绿 -->
+        <rect x="20" y="156" width="760" height="22" fill="#fff" stroke="#dfe2e6"/>
+        <rect x="28" y="161" width="12" height="12" rx="2" fill="#fff" stroke="#28a745"/><text x="70" y="171" font-size="9" fill="#333">工位A#</text><text x="160" y="171" font-size="9" fill="#333">App.exe</text><text x="300" y="171" font-size="9" fill="#333">V2.1</text><text x="410" y="171" font-size="9" fill="#333">V2.1</text><text x="500" y="171" font-size="9" fill="#333">A=B</text><text x="580" y="171" font-size="9" fill="#28a745" font-weight="700">● 最新</text><text x="680" y="171" font-size="9" fill="#999">—</text>
+        <!-- 行2 红 -->
+        <rect x="20" y="178" width="760" height="22" fill="#fff5f5" stroke="#dfe2e6"/>
+        <rect x="28" y="183" width="12" height="12" rx="2" fill="#28a745" stroke="#28a745"/><text x="34" y="193" font-size="9" fill="#fff">✓</text>
+        <text x="70" y="193" font-size="9" fill="#333">工位B#</text><text x="160" y="193" font-size="9" fill="#333">App.exe</text><text x="300" y="193" font-size="9" fill="#333">V1.8</text><text x="410" y="193" font-size="9" fill="#333">V2.1</text><text x="500" y="193" font-size="9" fill="#e63946" font-weight="600">A&lt;B</text><text x="580" y="193" font-size="9" fill="#e63946" font-weight="700">● 可更新</text><text x="680" y="193" font-size="9" fill="#555">\\工位B#\...</text>
+        <!-- 行3 红 -->
+        <rect x="20" y="200" width="760" height="22" fill="#fff5f5" stroke="#dfe2e6"/>
+        <rect x="28" y="205" width="12" height="12" rx="2" fill="#28a745" stroke="#28a745"/><text x="34" y="215" font-size="9" fill="#fff">✓</text>
+        <text x="70" y="215" font-size="9" fill="#333">工位D#</text><text x="160" y="215" font-size="9" fill="#333">App.exe</text><text x="300" y="215" font-size="9" fill="#333">V1.5</text><text x="410" y="215" font-size="9" fill="#333">V2.1</text><text x="500" y="215" font-size="9" fill="#e63946" font-weight="600">A&lt;B</text><text x="580" y="215" font-size="9" fill="#e63946" font-weight="700">● 可更新</text><text x="680" y="215" font-size="9" fill="#555">\\工位D#\...</text>
+        <!-- 行4 灰 -->
+        <rect x="20" y="222" width="760" height="22" fill="#fafbfc" stroke="#dfe2e6"/>
+        <rect x="28" y="227" width="12" height="12" rx="2" fill="#fff" stroke="#ccc"/>
+        <text x="70" y="237" font-size="9" fill="#333">工位C#</text><text x="160" y="237" font-size="9" fill="#333">App.exe</text><text x="300" y="237" font-size="9" fill="#333">V2.0</text><text x="410" y="237" font-size="9" fill="#999">—</text><text x="500" y="237" font-size="9" fill="#999">—</text><text x="580" y="237" font-size="9" fill="#999">● 未检测到</text><text x="680" y="237" font-size="9" fill="#999">—</text>
+        <!-- 图例 -->
+        <text x="20" y="270" font-size="10" fill="#888">图例：</text>
+        <circle cx="70" cy="266" r="4" fill="#28a745"/><text x="78" y="270" font-size="9" fill="#555">最新</text>
+        <circle cx="120" cy="266" r="4" fill="#e63946"/><text x="128" y="270" font-size="9" fill="#555">可更新</text>
+        <circle cx="180" cy="266" r="4" fill="#ccc"/><text x="188" y="270" font-size="9" fill="#555">未检测到新版本</text>
+        <!-- 更新日志 -->
+        <text x="20" y="296" font-size="10" font-weight="600" fill="#333">更新日志</text>
+        <rect x="20" y="302" width="760" height="30" rx="3" fill="#fafbfc" stroke="#e2e4e8"/>
+        <text x="28" y="316" font-size="9" fill="#28a745">[2026-07-06 10:30] 工位B# 更新成功 V1.8 → V2.1</text>
+        <text x="28" y="328" font-size="9" fill="#28a745">[2026-07-06 10:30] 工位D# 更新成功 V1.5 → V2.1</text>
+        <!-- 标注 -->
+        <circle cx="253" cy="76" r="12" fill="#e63946"/><text x="253" y="81" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+        <line x1="265" y1="76" x2="320" y2="56" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="324" y="54" font-size="11" fill="#e63946" font-weight="600">①确认后点此更新</text>
+        <circle cx="580" cy="189" r="11" fill="#e63946"/><text x="580" y="194" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+        <line x1="591" y1="189" x2="640" y2="170" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="644" y="168" font-size="10" fill="#e63946" font-weight="600">②红色=需更新</text>
+      </svg>
+    </div>
+    <div class="fig-cap">图6 · 扫描结果对比与一键更新</div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step">
+    <div class="step-head">
+      <div class="step-num">6</div>
+      <div class="step-title">监听模式 · 自动更新（可选）</div>
+    </div>
+    <div class="step-desc">开启<span class="key">「启用监听模式」</span>后，工具自动监视新版本目录；检测到新 EXE 文件时，自动扫描所有工位并执行更新，无需人工干预。</div>
+    <div class="fig">
+      <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="800" height="220" fill="#fff" stroke="#999" rx="6"/>
+        <rect x="0" y="0" width="800" height="36" fill="#f0f2f5" stroke="#ccc"/>
+        <text x="12" y="24" font-size="12" font-weight="700" fill="#0078d4">EXE版本管理工具</text>
+        <rect x="230" y="40" width="80" height="20" rx="3" fill="#0078d4"/><text x="270" y="54" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">智能操作 ★</text>
+        <!-- 监听模式区 -->
+        <rect x="20" y="76" width="760" height="120" rx="8" fill="#f0fff4" stroke="#28a745" stroke-width="1.5"/>
+        <text x="36" y="100" font-size="13" font-weight="700" fill="#333">监听模式</text>
+        <!-- 开关按钮 -->
+        <rect x="36" y="110" width="140" height="32" rx="16" fill="#28a745"/>
+        <circle cx="156" cy="126" r="12" fill="#fff"/>
+        <text x="80" y="131" font-size="11" fill="#fff" text-anchor="middle" font-weight="600">启用监听模式</text>
+        <text x="190" y="131" font-size="12" fill="#28a745" font-weight="700">● 监听已开启</text>
+        <text x="36" y="160" font-size="10" fill="#555">开启后自动监视新版本目录，检测到新 EXE 文件时自动扫描所有工位并进行更新。</text>
+        <text x="36" y="178" font-size="10" fill="#888">当前状态：正在监视 D:\NewVersions\ ...</text>
+        <!-- 标注 -->
+        <circle cx="96" cy="110" r="12" fill="#e63946"/><text x="96" y="115" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+        <line x1="108" y1="110" x2="160" y2="92" stroke="#e63946" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="164" y="90" font-size="11" fill="#e63946" font-weight="600">点击开关启用</text>
+      </svg>
+    </div>
+    <div class="fig-cap">图7 · 监听模式（开启后自动更新）</div>
+    <div class="tip">监听模式适合长期运行场景；如需手动控制更新时机，保持关闭即可。</div>
+  </div>
+
+  <!-- ===== 进阶操作 ===== -->
+  <h2>三、进阶操作（按需使用）</h2>
+  <div class="step-desc">以下两个 Tab 为手动操作方式，适合单工位调试或特殊场景。日常批量更新请优先使用「智能操作」。</div>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-title" style="font-size:15px;">程序扫描（Tab 1）</div>
+    </div>
+    <div class="step-desc" style="margin-left:0;">
+      用于手动扫描指定工位文件夹的程序版本。在「新设备程序目录配置」表格中添加行、填写 IP/共享名/账户/密码等信息后，点击「创建程序目录」生成目录，再点<span class="key">「扫描选中文件夹程序版本」</span>。勾选「深度搜索」可扫描子目录；勾选「过滤旧版本结果」可只显示最新版本（绿色）。
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-title" style="font-size:15px;">程序匹配（Tab 2）</div>
+    </div>
+    <div class="step-desc" style="margin-left:0;">
+      用于为每条扫描记录手动指定待推广的程序路径。在「程序扫描」页勾选记录后点「获取所选信息」，数据会带入本页表格；为每行填写「待推广程序路径」（可浏览或拖拽），确认版本对比后点<span class="key">「更新(复制-替换匹配-重命名)」</span>执行更新。
+    </div>
+  </div>
+
+  <!-- ===== 颜色含义速查 ===== -->
+  <h2>四、状态颜色速查</h2>
+  <table>
+    <tr><th>颜色</th><th>含义</th><th>出现位置</th></tr>
+    <tr><td><span class="color-green">● 绿色</span></td><td>最新版本（A=B 或已是最新）</td><td>扫描结果 / 匹配表格</td></tr>
+    <tr><td><span class="color-red">● 红色</span></td><td>可更新（A&lt;B，存在新版本）</td><td>扫描结果 / 匹配表格</td></tr>
+    <tr><td><span class="color-gray">● 灰色</span></td><td>未检测到新版本</td><td>智能操作扫描结果</td></tr>
+  </table>
+
+  <!-- ===== 常见问题 ===== -->
+  <h2>五、常见问题与注意事项</h2>
+  <div class="faq">
+    <div class="faq-item"><span class="q">页面打不开 / 全部灰色？</span> → 未登录。点击顶部「身份验证」按钮登录，遮罩消失后即可操作。</div>
+    <div class="faq-item"><span class="q">扫描后「一键更新」按钮仍是灰色？</span> → 说明没有检测到可更新工位（全部为最新或灰色），或未勾选待更新行。确认结果中有红色「可更新」记录。</div>
+    <div class="faq-item"><span class="q">扫描不到工位程序？</span> → 检查「参数设定」中的工位文件夹名称规则与 EXE 名称是否与实际一致；确认扫描模式选择正确（远程/本机）。</div>
+    <div class="faq-item"><span class="q">新版本路径怎么填？</span> → 选择<b>外层总目录</b>即可，系统自动搜索其下所有子文件夹内的 EXE，无需逐个指定。</div>
+    <div class="faq-item"><span class="q">设备号前缀有什么用？</span> → 勾选「启用设备号」并填写后，创建目录/扫描时会以「设备号#」作为工位名称文件夹前缀，便于多设备区分。</div>
+    <div class="faq-item"><span class="q">参数改了不生效？</span> → 修改参数设定后，必须依次点击「保存参数」→「读取配置」才会生效。</div>
+    <div class="faq-item"><span class="q">{版本号} 占位符？</span> → 参数设定表格中的 {版本号} 会在运行时自动替换为实际版本号，无需手动填写。</div>
+    <div class="faq-item"><span class="q">关闭窗口后程序还在运行吗？</span> → 若首次选择「最小化到系统托盘」，关闭窗口后程序驻留托盘；可在「参数设定」底部修改此行为。</div>
+  </div>
+
+  <div class="footer">
+    程序更新工具（EXE版本管理工具）V2.0 · 使用SOP · 内部文档<br>
+    路径：W:\Tools\UpdataSoftware\UpdateSoftware V2.0 · 技术栈：WPF .NET Framework 4.7.2
+  </div>
+
+</div>
+</body>
+</html>
