@@ -1,0 +1,1485 @@
+<Page x:Class="UpdateSoftware.Pages.UpdateEXE"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:UpdateSoftware.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="1100"
+      Title="UpdateEXE"
+      Background="{DynamicResource Transparent}"
+      Foreground="{DynamicResource PageText}">
+
+    <Page.Resources>
+        <!-- ===== 基础样式 ===== -->
+        <Style x:Key="SectionBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ControlBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <!-- ===== 按钮样式（含 Hover/Pressed 反馈） ===== -->
+        <Style TargetType="Button" x:Key="ActionButton">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.85"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.7"/>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.97" ScaleY="0.97"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="DangerButton" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="{DynamicResource DangerColor}"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="SuccessButton" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="{DynamicResource SuccessColor}"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="SmallTagButton">
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.85"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.7"/>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.96" ScaleY="0.96"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ===== 输入框样式 ===== -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource PageText}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource PageText}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ===== ListBox 样式 ===== -->
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+        </Style>
+
+        <!-- ===== 暗色滚动条样式 ===== -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style TargetType="ScrollBar" x:Key="DarkScrollBarStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineUpCommand" Background="Transparent"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineDownCommand" Background="Transparent"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Background="#555555" BorderThickness="0"
+                                           Width="8" Margin="1,0,1,0"
+                                           Cursor="Hand">
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb">
+                                                <Setter Property="Background" Value="#555555"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#777777"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter Property="Background" Value="#999999"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <ScrollContentPresenter CanContentScroll="{TemplateBinding CanContentScroll}"
+                                                    Margin="{TemplateBinding Padding}"/>
+                            <ScrollBar x:Name="PART_VerticalScrollBar" Style="{StaticResource DarkScrollBarStyle}"
+                                       Orientation="Vertical" HorizontalAlignment="Right"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                            <ScrollBar x:Name="PART_HorizontalScrollBar" Style="{StaticResource DarkScrollBarStyle}"
+                                       Orientation="Horizontal" VerticalAlignment="Bottom"
+                                       Value="{TemplateBinding HorizontalOffset}"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== TreeViewItem 样式 ===== -->
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="2,3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3E3E42"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ===== DataGrid 默认行悬停样式 ===== -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3A3A3E"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ===== ComboBox 样式 ===== -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A4A4E"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ===== CheckBox 样式 ===== -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <WrapPanel>
+                            <Grid Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,4,0">
+                                <Rectangle Name="CheckBoxBorder" Fill="{DynamicResource ControlBg}" Stroke="{DynamicResource TextSecondary}" StrokeThickness="1"
+                                           RadiusX="2" RadiusY="2"/>
+                                <Path Name="CheckMark" Data="M3,8 L7,12 L13,4" Stroke="{DynamicResource PageText}" StrokeThickness="2"
+                                      StrokeLineJoin="Round" StrokeEndLineCap="Round" StrokeStartLineCap="Round"
+                                      Visibility="Collapsed"/>
+                            </Grid>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </WrapPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Fill" Value="{DynamicResource InputBg}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== RadioButton 样式 ===== -->
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.85"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ===== ToggleButton 样式 ===== -->
+        <Style TargetType="ToggleButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.85"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.7"/>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.97" ScaleY="0.97"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+<!-- ===== 顶部标题栏 ===== -->
+<Border Grid.Row="0" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,8"
+Background="{DynamicResource SideBarBg}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- 标题 + 换肤按钮 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="EXE版本管理工具"
+                               FontSize="16" FontWeight="Bold"
+                               Foreground="{DynamicResource AccentColor}"
+                               VerticalAlignment="Center" Margin="5,0,4,0"/>
+                    <Button x:Name="BtnThemeSwitch"
+                            Content="👚" FontSize="16"
+                            Width="30" Height="26"
+                            Background="Transparent"
+                            Foreground="{DynamicResource TextSecondary}"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="BtnThemeCycle_Click"
+                            ToolTip="切换夜间/日间模式"/>
+                </StackPanel>
+                <TextBlock x:Name="TxtAuthUser" Grid.Column="1"
+                           FontSize="13" FontWeight="Bold"
+                           Foreground="#FFA500" VerticalAlignment="Center"
+                           Margin="8,0,0,0"/>
+                <WrapPanel Grid.Column="2" Margin="0,0,5,0">
+                    <TextBlock Text="设备号:" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondary}" Margin="5,0" FontSize="11"/>
+                    <TextBox x:Name="TxtDeviceNumber" Width="80" Height="22"
+                             Margin="3,0" VerticalAlignment="Center"
+                             FontSize="12" FontWeight="Bold"
+                             Foreground="{DynamicResource AccentColor}"/>
+                    <CheckBox x:Name="ChkUseDevicePrefix" Content="启用设备号"
+                              IsChecked="True" Foreground="{DynamicResource PageText}"
+                              VerticalAlignment="Center" Margin="8,0,2,0" FontSize="11"/>
+                    <TextBlock Text="（创建目录/扫描时 以'设备号#'作为工位名称文件夹前缀）"
+                               Foreground="{DynamicResource TextMuted}"
+                               FontSize="10" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <Rectangle Width="1" Height="22" Fill="{DynamicResource BorderColor}"
+                               VerticalAlignment="Center" Margin="5,0"/>
+                    <Button x:Name="BtnAuth"
+                            Content="身份验证" Style="{StaticResource SmallTagButton}"
+                            Background="OrangeRed"
+                            Click="BtnAuth_Click" Margin="2,0"/>
+                    <Button x:Name="BtnSaveConfig"
+                            Content="保存参数" Style="{StaticResource SmallTagButton}"
+                            Background="{DynamicResource SuccessColor}"
+                            Click="BtnSaveConfig_Click" Margin="2,0"/>
+                    <Button x:Name="BtnLoadConfig"
+                            Content="读取配置" Style="{StaticResource SmallTagButton}"
+                            Click="BtnLoadConfig_Click" Margin="2,0"/>
+                    <Button x:Name="BtnCreateShortcut"
+                            Content="为所选程序创建快捷方式"
+                            Style="{StaticResource SmallTagButton}"
+                            Background="Orange"
+                            Click="BtnCreateShortcut_Click"
+                            Margin="2,0"/>
+                    <Button x:Name="BtnFixFolderName"
+                            Content="按定义规则命名选中文件夹名称"
+                            Style="{StaticResource SmallTagButton}"
+                            Background="Orange"
+                            Click="BtnFixFolderName_Click"
+                            Margin="2,0"/>
+                </WrapPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== 主内容区域 ===== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 遮罩层（未验证身份时显示） -->
+            <Border x:Name="BorderAuthOverlay"
+                    Background="#AA1E1E1E"
+                    Panel.ZIndex="10" Visibility="Visible"
+                    Grid.ColumnSpan="3">
+                <Grid>
+                    <Border Background="#2D2D30" CornerRadius="8"
+                            Width="320" Height="140"
+                            BorderBrush="#FFA500" BorderThickness="2"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Viewbox Width="28" Height="28" Margin="0,0,0,6">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M12,2 C8.13,2 5,5.13 5,9 L5,12 L4,12 C2.9,12 2,12.9 2,14 L2,21 C2,22.1 2.9,23 4,23 L20,23 C21.1,23 22,22.1 22,21 L22,14 C22,12.9 21.1,12 20,12 L19,12 L19,9 C19,5.13 15.87,2 12,2 Z M12,4 C14.76,4 17,6.24 17,9 L17,12 L7,12 L7,9 C7,6.24 9.24,4 12,4 Z M12,17 C13.1,17 14,17.9 14,19 C14,20.1 13.1,21 12,21 C10.9,21 10,20.1 10,19 C10,17.9 10.9,17 12,17 Z"
+                                          Fill="#FFA500"/>
+                                </Canvas>
+                            </Viewbox>
+                            <TextBlock Text="页面已锁定"
+                                       FontSize="18" FontWeight="Bold"
+                                       Foreground="#FFA500"
+                                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock Text="请点击顶部「身份验证」按钮进行登录"
+                                       FontSize="13" Foreground="#999999"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ===== 左侧：目录树 ===== -->
+            <Border Grid.Column="0" Style="{StaticResource SectionBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="程序目录结构"
+                               Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,8"/>
+
+                    <!-- 模式切换 + 路径输入（共用一个输入框和按钮） -->
+                    <Border Grid.Row="1" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                            Background="{DynamicResource SideBarBg}" Padding="4,2">
+                        <StackPanel>
+                            <!-- 第一行：模式切换 -->
+                            <WrapPanel Margin="0,0,0,4">
+                                <RadioButton x:Name="RbtnLocalMode" Content="本机地址"
+                                             GroupName="AccessMode"
+                                             IsChecked="True"
+                                             Foreground="{DynamicResource PageText}"
+                                             FontSize="11" VerticalAlignment="Center"
+                                             Margin="2,0,10,0"
+                                             Checked="RbtnAccessMode_Checked"/>
+                                <RadioButton x:Name="RbtnRemoteMode" Content="非本机地址"
+                                             GroupName="AccessMode"
+                                             Foreground="{DynamicResource PageText}"
+                                             FontSize="11" VerticalAlignment="Center"
+                                             Checked="RbtnAccessMode_Checked"/>
+                            </WrapPanel>
+                            <!-- 第二行：路径输入 + 浏览/访问按钮 -->
+                            <WrapPanel>
+                                <Button x:Name="BtnAccessPath" Content="浏览"
+                                         Style="{StaticResource SmallTagButton}"
+                                         Background="{DynamicResource SuccessColor}"
+                                         Click="BtnAccessPath_Click" Margin="5,0,0,0" MinWidth="48"/>
+                                <!-- 本机模式：TextBox -->
+                                <TextBox x:Name="TxtBasePath" Text="" Height="22" Margin="10,0,0,0"
+                                         FontSize="11" VerticalAlignment="Center"
+                                         Width="200"/>
+                                <!-- 非本机模式：可编辑下拉框（默认隐藏） -->
+                                <ComboBox x:Name="CbRemotePath" IsEditable="True" Height="22"
+                                          FontSize="11" VerticalAlignment="Center"  Margin="10,0,0,0"
+                                          Width="180" Visibility="Collapsed"/>
+
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 目录树操作按钮 -->
+                    <WrapPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,0,0,4">
+                        <Button x:Name="BtnRefreshTree"
+                                Content="刷新" Style="{StaticResource SmallTagButton}"
+                                Click="BtnRefreshTree_Click" Margin="1"
+                                Background="{DynamicResource SuccessColor}"/>
+                        <Button x:Name="BtnExpandAllTree"
+                                Content="全部展开" Style="{StaticResource SmallTagButton}"
+                                Click="BtnExpandAllTree_Click" Margin="1"/>
+                        <Button x:Name="BtnCollapseAllTree"
+                                Content="全部折叠" Style="{StaticResource SmallTagButton}"
+                                Click="BtnCollapseAllTree_Click" Margin="1"/>
+                        <Button x:Name="BtnExpandOneLevel"
+                                Content="展开一级" Style="{StaticResource SmallTagButton}"
+                                Click="BtnExpandOneLevel_Click" Margin="1"/>
+                    </WrapPanel>
+
+                    <!-- 目录树控件 -->
+                    <TreeView Grid.Row="3" x:Name="TreeViewDirectory"
+                              Background="{DynamicResource InputBg}"
+                              Foreground="{DynamicResource PageText}"
+                              BorderBrush="{DynamicResource BorderColor}"
+                              BorderThickness="1"
+                              SelectedItemChanged="TreeViewDirectory_SelectedItemChanged"
+                              FontSize="12"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+                    <!-- 选中文件夹路径显示 -->
+                    <Border Grid.Row="4" Style="{StaticResource SectionBorderStyle}" Margin="0,4,0,0"
+                            Background="{DynamicResource SideBarBg}" Padding="4,2">
+                        <TextBox x:Name="TxtSelectedPath" Text="(未选择)" Height="22"
+                                 FontSize="10" VerticalAlignment="Center"
+                                 Background="Transparent"
+                                 Foreground="{DynamicResource TextSecondary}"
+                                 BorderThickness="0" IsReadOnly="True"
+                                 TextWrapping="NoWrap" Padding="0,0,0,2"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ===== 分隔条（可拖动） ===== -->
+            <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Center"
+                          Background="{DynamicResource BorderColor}"
+                          BorderBrush="{DynamicResource BorderColor}"
+                          ResizeBehavior="PreviousAndNext"
+                          ShowsPreview="False"
+                          Cursor="SizeWE">
+                <GridSplitter.Style>
+                    <Style TargetType="GridSplitter">
+                        <Setter Property="Background" Value="{DynamicResource BorderColor}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </GridSplitter.Style>
+            </GridSplitter>
+
+            <!-- ===== 右侧：Tab页切换 ===== -->
+            <Border Grid.Column="2" Style="{StaticResource SectionBorderStyle}">
+                <TabControl x:Name="TabControlRight"
+                            Background="{DynamicResource Transparent}"
+                            BorderThickness="0">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Background" Value="{DynamicResource ControlBg}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="Padding" Value="14,8"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Grid Margin="0,0,2,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="3"/>
+                                            </Grid.RowDefinitions>
+                                            <Border Name="Border"
+                                                    Grid.Row="0"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="4,4,0,0"
+                                                    Padding="{TemplateBinding Padding}"
+                                                    Cursor="Hand">
+                                                <TextBlock Text="{TemplateBinding Header}"
+                                                           Foreground="{TemplateBinding Foreground}"
+                                                           FontSize="{TemplateBinding FontSize}"/>
+                                            </Border>
+                                            <!-- 选中指示器 -->
+                                            <Border Name="Indicator" Grid.Row="1"
+                                                    Height="3"
+                                                    Background="Transparent"
+                                                    CornerRadius="1,1,0,0"
+                                                    HorizontalAlignment="Stretch"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource ControlBg}"/>
+                                                <Setter TargetName="Indicator" Property="Background" Value="{DynamicResource AccentColor}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#3E3E42"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <!-- ============ Tab 0: 程序扫描 ============ -->
+                    <TabItem Header="程序扫描">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- ===== 新设备配置（从UpdateProgram移植） ===== -->
+                            <Border Grid.Row="0" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                                    Background="{DynamicResource SideBarBg}" Padding="4,2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <!-- 工具栏 -->
+                                    <WrapPanel Grid.Row="0" Margin="0,0,0,4">
+                                        <TextBlock Text="新设备程序目录配置"
+                                                   Style="{StaticResource SectionTitleStyle}"
+                                                   Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                        <Button x:Name="BtnDeviceAddRow" Content="添加行"
+                                                Style="{StaticResource SmallTagButton}" Click="BtnDeviceAddRow_Click" Margin="3"/>
+                                        <Button x:Name="BtnDeviceDeleteRow" Content="删除行"
+                                                Style="{StaticResource SmallTagButton}"
+                                                Background="{DynamicResource DangerColor}"
+                                                Click="BtnDeviceDeleteRow_Click" Margin="3"/>
+                                        <Rectangle Width="1" Height="22" Fill="{DynamicResource BorderColor}"
+                                                   VerticalAlignment="Center" Margin="5,0"/>
+                                        <Button x:Name="BtnDeviceCreateDirs"
+                                                Content="创建程序目录"
+                                                Height="24" FontSize="11" FontWeight="Bold"
+                                                Padding="12,0"
+                                                Foreground="{DynamicResource PageText}"
+                                                Background="{DynamicResource SuccessColor}"
+                                                BorderThickness="0" Cursor="Hand"
+                                                Click="BtnDeviceCreateDirs_Click" Margin="3"/>
+                                    </WrapPanel>
+                                    <!-- 配置表格（固定高度） -->
+                                    <DataGrid Grid.Row="1" x:Name="DataGridDeviceConfig"
+                                              AutoGenerateColumns="False"
+                                              CanUserAddRows="False"
+                                              CanUserDeleteRows="False"
+                                              CanUserResizeColumns="True"
+                                              HeadersVisibility="All"
+                                              Height="200"
+                                              RowHeaderWidth="0"
+                                              Background="{DynamicResource InputBg}"
+                                              Foreground="{DynamicResource PageText}"
+                                              BorderBrush="{DynamicResource BorderColor}"
+                                              FontSize="10"
+                                              SelectionMode="Single"
+                                              GridLinesVisibility="Horizontal"
+                                              MaxHeight="500"
+                                              Margin="0,0,0,2"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <DataGrid.Resources>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="Background" Value="{DynamicResource ControlBg}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                                <Setter Property="FontSize" Value="10"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            </Style>
+                                            <Style TargetType="DataGridCell">
+                                                <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                                <Setter Property="FontSize" Value="10"/>
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGrid.Resources>
+                                        <DataGrid.Columns>
+                                            <DataGridCheckBoxColumn Header="勾选" Binding="{Binding IsSelected, Mode=TwoWay}"
+                                                                    Width="30" IsThreeState="False"/>
+                                            <DataGridCheckBoxColumn Header="跨工控机" Binding="{Binding IsCrossMachine, Mode=TwoWay}"
+                                                                    Width="50" IsThreeState="False"/>
+                                            <DataGridComboBoxColumn Header="IP地址"
+                                                                    ItemsSource="{Binding Source={x:Static local:UpdateEXE.DefaultIPList}}"
+                                                                    SelectedItemBinding="{Binding RemoteIP, Mode=TwoWay}"
+                                                                    Width="90"/>
+                                            <DataGridTextColumn Header="共享名" Binding="{Binding ShareName, Mode=TwoWay}"
+                                                                Width="45"/>
+                                            <DataGridTextColumn Header="账户" Binding="{Binding Account, Mode=TwoWay}"
+                                                                Width="90"/>
+                                            <DataGridTextColumn Header="密码" Binding="{Binding Password, Mode=TwoWay}"
+                                                                Width="60"/>
+                                            <DataGridComboBoxColumn Header="磁盘"
+                                                                    ItemsSource="{Binding Source={x:Static local:UpdateEXE.DriveList}}"
+                                                                    SelectedItemBinding="{Binding SelectedDrive, Mode=TwoWay}"
+                                                                    Width="50"/>
+                                            <DataGridTextColumn Header="一级文件夹(统一存放)" Binding="{Binding RootFolderName, Mode=TwoWay}"
+                                                                Width="*" MinWidth="60"/>
+                                            <DataGridTextColumn Header="二级文件夹(工位名称)" Binding="{Binding SubFolderName, Mode=TwoWay}"
+                                                                Width="*" MinWidth="60"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </Border>
+
+                            <!-- 当前选中文件夹匹配信息 -->
+                            <Border Grid.Row="1" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="当前选中："
+                                                   Foreground="{DynamicResource AccentColor}"
+                                                   FontWeight="Bold" FontSize="12"
+                                                   Margin="2,0,0,4"/>
+                                        <ItemsControl x:Name="ItemsMatchedInfo"
+                                                      FontSize="11">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding DisplayText}"
+                                                               Foreground="{Binding TextColor}"
+                                                               Margin="4,1,0,1"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" x:Name="BtnRenameFolder"
+                                            Content="修正程序文件夹命名"
+                                            Height="28" FontSize="12" FontWeight="Bold"
+                                            Padding="14,0"
+                                            Foreground="{DynamicResource PageText}"
+                                            Background="{DynamicResource DangerColor}"
+                                            BorderThickness="0" Cursor="Hand"
+                                            Click="BtnRenameFolder_Click"
+                                            VerticalAlignment="Top"
+                                            Margin="0,24,2,0"
+                                            Visibility="Collapsed"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- 工具栏 -->
+                            <Border Grid.Row="2" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                                    Background="{DynamicResource SideBarBg}">
+                                <WrapPanel>
+                                    <CheckBox x:Name="ChkDeepSearch" Content="深度搜索"
+                                              IsChecked="True"
+                                              Foreground="{DynamicResource PageText}"
+                                              VerticalAlignment="Center" Margin="5,0"/>
+                                    <Button x:Name="BtnScanVersion"
+                                            Content="扫描选中文件夹程序版本"
+                                            Height="28" FontSize="12" FontWeight="Bold"
+                                            Padding="14,0"
+                                            Foreground="{DynamicResource PageText}"
+                                            Background="{DynamicResource SuccessColor}"
+                                            BorderThickness="0" Cursor="Hand"
+                                            Click="BtnScanVersion_Click" Margin="5,0"/>
+                                    <Button x:Name="BtnGetLatestInfos"
+                                            Content="获取所选信息"
+                                            Height="28" FontSize="12" FontWeight="Bold"
+                                            Padding="14,0"
+                                            Foreground="{DynamicResource PageText}"
+                                            Background="{DynamicResource AccentColor}"
+                                            BorderThickness="0" Cursor="Hand"
+                                            Click="BtnGetLatestInfos_Click" Margin="5,0"/>
+                                </WrapPanel>
+                            </Border>
+
+                            <!-- 过滤选项 -->
+                            <Border Grid.Row="3" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                                    Background="{DynamicResource SideBarBg}" Padding="4,2">
+                                <WrapPanel>
+                                    <CheckBox x:Name="ChkFilterOldVersions" Content="过滤旧版本结果"
+                                              Foreground="{DynamicResource PageText}"
+                                              VerticalAlignment="Center" Margin="5,0"
+                                              Checked="ChkFilterOldVersions_Checked"
+                                              Unchecked="ChkFilterOldVersions_Unchecked"/>
+                                    <TextBlock Text="（绿色=最新版本，红色=旧版本）"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                </WrapPanel>
+                            </Border>
+
+                            <!-- 扫描结果列表 -->
+                            <Border Grid.Row="5" Style="{StaticResource SectionBorderStyle}"
+                                    Background="{DynamicResource SideBarBg}">
+                                <ListBox x:Name="ListBoxScanResults"
+                                         Background="{DynamicResource InputBg}"
+                                         Foreground="{DynamicResource PageText}"
+                                         BorderThickness="0"
+                                         FontSize="11"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource BorderColor}"
+                                                    BorderThickness="0,0,0,1" Padding="2,4">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- 勾选按钮 -->
+                                                    <CheckBox Grid.Row="0" Grid.RowSpan="3" Grid.Column="0"
+                                                              IsChecked="{Binding IsSelected}"
+                                                              VerticalAlignment="Center"
+                                                              Margin="2,0,6,0"
+                                                              Foreground="{DynamicResource PageText}"/>
+
+                                                    <!-- 第一行：EXE名称 + 版本 -->
+                                                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding ExeName}"
+                                                                   FontWeight="Bold" FontSize="12"
+                                                                   Foreground="{Binding TextColor}"
+                                                                   VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding FileVersion, StringFormat=' V{0}'}"
+                                                                   Foreground="{Binding TextColor}"
+                                                                   FontSize="11"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="8,0,0,0"/>
+                                                    </StackPanel>
+
+                                                    <!-- 第二行：时间信息 -->
+                                                    <WrapPanel Grid.Row="1" Grid.Column="1" Margin="0,2,0,0">
+                                                        <TextBlock Text="{Binding CreationTime, StringFormat='创建: {0:yyyy-MM-dd HH:mm}'}"
+                                                                   Foreground="{DynamicResource TextSecondary}" FontSize="10" Margin="0,0,12,0"/>
+                                                        <TextBlock Text="{Binding LastWriteTime, StringFormat='修改: {0:yyyy-MM-dd HH:mm}'}"
+                                                                   Foreground="{DynamicResource TextSecondary}" FontSize="10" Margin="0,0,12,0"/>
+                                                        <TextBlock Text="{Binding LastAccessTime, StringFormat='访问: {0:yyyy-MM-dd HH:mm}'}"
+                                                                   Foreground="{DynamicResource TextSecondary}" FontSize="10"/>
+                                                    </WrapPanel>
+
+                                                    <!-- 第三行：路径信息 -->
+                                                    <WrapPanel Grid.Row="2" Grid.Column="1" Margin="0,1,0,0">
+                                                        <TextBlock Text="{Binding FolderName, StringFormat='文件夹: {0}'}"
+                                                                   Foreground="{DynamicResource TextSecondary}" FontSize="10" Margin="0,0,12,0"/>
+                                                        <TextBlock Text="{Binding FullPath}"
+                                                                   Foreground="{DynamicResource TextSecondary}" FontSize="10"/>
+                                                    </WrapPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- ============ Tab 1: 程序匹配 ============ -->
+                    <TabItem Header="程序匹配">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Style="{StaticResource SectionBorderStyle}" Margin="0,0,4,4"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <WrapPanel>
+                                    <TextBlock Text="在程序扫描页面勾选后点击获取所选信息，然后在下方为每条记录指定待推广更新的程序路径"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               FontSize="11" VerticalAlignment="Center"/>
+                                    <Button x:Name="BtnClearSelectedMatchItems"
+                                            Content="清除选中项"
+                                            Height="24" FontSize="10"
+                                            Padding="10,0"
+                                            Foreground="{DynamicResource PageText}"
+                                            Background="{DynamicResource DangerColor}"
+                                            BorderThickness="0" Cursor="Hand"
+                                            Click="BtnClearSelectedMatchItems_Click"
+                                            Margin="10,0,0,0"/>
+                                    <Button x:Name="BtnUpdateCopyReplaceRename"
+                                            Content="更新(复制-替换匹配-重命名)"
+                                            Height="24" FontSize="10"
+                                            Padding="10,0"
+                                            Foreground="{DynamicResource PageText}"
+                                            Background="{DynamicResource SuccessColor}"
+                                            BorderThickness="0" Cursor="Hand"
+                                            Click="BtnUpdateCopyReplaceRename_Click"
+                                            Margin="10,0,0,0"/>
+                                </WrapPanel>
+                            </Border>
+
+                            <Border Grid.Row="2" Style="{StaticResource SectionBorderStyle}"
+                                    Background="{DynamicResource SideBarBg}">
+                                <DataGrid x:Name="DataGridMatchPrograms"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          HeadersVisibility="Column"
+                                          RowHeaderWidth="0"
+                                          Background="{DynamicResource InputBg}"
+                                          Foreground="{DynamicResource PageText}"
+                                          BorderThickness="0"
+                                          FontSize="11"
+                                          RowHeight="36"
+                                          SelectionMode="Single"
+                                          SelectionUnit="FullRow"
+                                          GridLinesVisibility="Horizontal"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <DataGrid.Resources>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentColor}"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="Background" Value="{DynamicResource SideBarBg}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                            <Setter Property="Height" Value="28"/>
+                                        </Style>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="2,0"/>
+                                        </Style>
+                                    </DataGrid.Resources>
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Header="选择" Width="40">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              VerticalAlignment="Center"
+                                                              HorizontalAlignment="Center"
+                                                              Foreground="{DynamicResource PageText}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="工位" Binding="{Binding StationPattern}" Width="80" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="程序位置" Binding="{Binding FullPath}" Width="180" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="当前版本(A)" Binding="{Binding FileVersion, StringFormat='V{0}'}" Width="90" IsReadOnly="True"/>
+                                        <DataGridTemplateColumn Header="待推广程序路径" Width="200" MinWidth="150">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid AllowDrop="True" Background="Transparent"
+                                                          Drop="Grid_Drop"
+                                                          PreviewDragOver="Grid_DragOver">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBox Grid.Column="0" Text="{Binding TargetFolderPath, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Background="{DynamicResource InputBg}"
+                                                                 Foreground="{DynamicResource PageText}"
+                                                                 BorderBrush="{DynamicResource BorderColor}"
+                                                                 BorderThickness="1" Padding="2,0" FontSize="11"
+                                                                 VerticalAlignment="Center" Height="24"
+                                                                 AllowDrop="True"
+                                                                 PreviewDragOver="TextBox_PreviewDragOver"
+                                                                 Drop="TextBox_Drop"/>
+                                                        <Button Grid.Column="1" Content="浏览"
+                                                                Height="24" Padding="6,0" FontSize="10"
+                                                                Foreground="{DynamicResource PageText}"
+                                                                Background="{DynamicResource AccentColor}"
+                                                                BorderThickness="0" Cursor="Hand"
+                                                                Click="BtnBrowseTargetPath_Click"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="推广版本(B)" Binding="{Binding TargetFileVersion, StringFormat='V{0}'}" Width="90" IsReadOnly="True"/>
+                                        <DataGridTemplateColumn Header="版本对比" Width="130">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding VersionCompareText}"
+                                                               Foreground="{Binding VersionCompareColor}"
+                                                               FontWeight="Bold"
+                                                               VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="状态" Width="100">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding MatchStatusText}"
+                                                               Foreground="{Binding MatchStatusColor}"
+                                                               FontWeight="Bold"
+                                                               VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="推广后新文件夹" Binding="{Binding NewFolderName}" Width="160" IsReadOnly="True"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- ============ Tab 2: 参数设定 ============ -->
+                    <TabItem Header="参数设定">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 按钮区 + 规则说明 -->
+                            <WrapPanel Grid.Row="0" Margin="0,0,0,6">
+                                <Button x:Name="BtnAddParamRow"
+                                        Content="添加行" Style="{StaticResource SmallTagButton}"
+                                        Click="BtnAddParamRow_Click" Margin="3"/>
+                                <Button x:Name="BtnDeleteParamRow"
+                                        Content="删除选中行" Style="{StaticResource SmallTagButton}"
+                                        Background="{DynamicResource DangerColor}"
+                                        Click="BtnDeleteParamRow_Click" Margin="3"/>
+                                <Rectangle Width="1" Height="24" Fill="{DynamicResource BorderColor}"
+                                           VerticalAlignment="Center" Margin="8,0"/>
+                                <TextBlock Text="程序文件夹识别规则：选中文件夹内有下方表格中匹配的exe程序名称"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           FontSize="11"
+                                           VerticalAlignment="Center"
+                                           Margin="3,0"/>
+                            </WrapPanel>
+
+                            <!-- 配置表格 -->
+                            <DataGrid Grid.Row="1" x:Name="DataGridParamConfig"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      CanUserResizeColumns="True"
+                                      HeadersVisibility="All"
+                                      RowHeaderWidth="0"
+                                      Background="{DynamicResource InputBg}"
+                                      Foreground="{DynamicResource PageText}"
+                                      BorderBrush="{DynamicResource BorderColor}"
+                                      FontSize="11"
+                                      SelectionMode="Single"
+                                      GridLinesVisibility="Horizontal"
+                                      MinHeight="120"
+                                      MaxHeight="300"
+                                      Margin="0,0,0,6"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto"
+                                      ColumnWidth="SizeToCells"
+                                      EnableColumnVirtualization="True">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="{DynamicResource ControlBg}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                        <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                        <Setter Property="FontSize" Value="11"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Background" Value="{DynamicResource InputBg}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                        <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                        <Setter Property="FontSize" Value="11"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="工位文件夹名称要求" Binding="{Binding StationFolderPattern, Mode=TwoWay}"
+                                                        Width="Auto" MinWidth="120" MaxWidth="200"/>
+                                    <DataGridTextColumn Header="EXE程序名称要求（全匹配）" Binding="{Binding ExeNamePattern, Mode=TwoWay}"
+                                                        Width="Auto" MinWidth="120" MaxWidth="200"/>
+                                    <DataGridTextColumn Header="程序文件夹命名" Binding="{Binding FolderNamingRule, Mode=TwoWay}"
+                                                        Width="Auto" MinWidth="120" MaxWidth="250"/>
+                                    <DataGridTextColumn Header="程序快捷方式命名与扫描规则" Binding="{Binding ShortcutNamingRule, Mode=TwoWay}"
+                                                        Width="Auto" MinWidth="120" MaxWidth="250"/>
+                                    <DataGridTextColumn Header="发送快捷方式地址" Binding="{Binding ShortcutDestPath, Mode=TwoWay}"
+                                                        Width="Auto" MinWidth="100" MaxWidth="200"/>
+                                    <DataGridTextColumn Header="远程账户" Binding="{Binding RemoteAccount, Mode=TwoWay}"
+                                                        Width="120"/>
+                                    <DataGridTextColumn Header="远程密码" Binding="{Binding RemotePassword, Mode=TwoWay}"
+                                                        Width="100"/>
+                                    <DataGridTextColumn Header="远程访问地址" Binding="{Binding RemotePath, Mode=TwoWay}"
+                                                        Width="Auto" MinWidth="140" MaxWidth="300"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- 快捷方式创建地址 -->
+                            <Border Grid.Row="2" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,6"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <WrapPanel>
+                                    <TextBlock Text="程序快捷方式创建地址:"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TextSecondary}" FontSize="11"
+                                               Margin="2,0,6,0"/>
+                                    <TextBox x:Name="TxtDesktopPath" Text="" Height="22"
+                                             FontSize="11" VerticalAlignment="Center"
+                                             Width="300"/>
+                                    <Button x:Name="BtnDetectDesktop"
+                                            Content="识别本机桌面" Style="{StaticResource SmallTagButton}"
+                                            Background="{DynamicResource AccentColor}"
+                                            Click="BtnDetectDesktop_Click" Margin="6,0,0,0"/>
+                                </WrapPanel>
+                            </Border>
+
+                            <!-- 日志路径与配置文件路径 -->
+                            <Border Grid.Row="3" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,6"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <StackPanel>
+                                    <WrapPanel Margin="0,0,0,4">
+                                        <TextBlock Text="日志文件目录:"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource TextSecondary}" FontSize="11"
+                                                   Margin="2,0,6,0" Width="100"/>
+                                        <TextBox x:Name="TxtLogPath" Text="" Height="22"
+                                                 FontSize="11" VerticalAlignment="Center" Width="300"/>
+                                        <Button x:Name="BtnBrowseLogPath"
+                                                Content="浏览" Style="{StaticResource SmallTagButton}"
+                                                Background="{DynamicResource AccentColor}"
+                                                Click="BtnBrowseLogPath_Click" Margin="6,0,0,0"/>
+                                        <Button x:Name="BtnOpenLogDir"
+                                                Content="📂打开" Style="{StaticResource SmallTagButton}"
+                                                Click="BtnOpenLogDir_Click" Margin="4,0,0,0"/>
+                                        <Button x:Name="BtnResetLogPath"
+                                                Content="重置默认" Style="{StaticResource SmallTagButton}"
+                                                Click="BtnResetLogPath_Click" Margin="4,0,0,0"/>
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <TextBlock Text="配置文件路径:"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource TextSecondary}" FontSize="11"
+                                                   Margin="2,0,6,0" Width="100"/>
+                                        <TextBox x:Name="TxtConfigPath" Text="" Height="22"
+                                                 FontSize="11" VerticalAlignment="Center" Width="300"/>
+                                        <Button x:Name="BtnBrowseConfigPath"
+                                                Content="浏览" Style="{StaticResource SmallTagButton}"
+                                                Background="{DynamicResource AccentColor}"
+                                                Click="BtnBrowseConfigPath_Click" Margin="6,0,0,0"/>
+                                        <Button x:Name="BtnOpenConfigDir"
+                                                Content="📂打开" Style="{StaticResource SmallTagButton}"
+                                                Click="BtnOpenConfigDir_Click" Margin="4,0,0,0"/>
+                                        <Button x:Name="BtnResetConfigPath"
+                                                Content="重置默认" Style="{StaticResource SmallTagButton}"
+                                                Click="BtnResetConfigPath_Click" Margin="4,0,0,0"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 备注信息区 -->
+                            <Border Grid.Row="4" Style="{StaticResource SectionBorderStyle}"
+                                    Background="{DynamicResource SideBarBg}">
+                                <TextBlock Text="提示：表格中的占位符{版本号}将在运行时自动替换"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           FontSize="11"
+                                           VerticalAlignment="Center"
+                                           Margin="5"/>
+                            </Border>
+
+                            <!-- 关闭行为设置 -->
+                            <Border Grid.Row="5" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,6"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <WrapPanel>
+                                    <TextBlock Text="关闭窗口时:"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TextSecondary}" FontSize="11"
+                                               Margin="2,0,6,0"/>
+                                    <ComboBox x:Name="CbCloseBehavior" Width="180" Height="22" FontSize="11"
+                                              VerticalAlignment="Center"
+                                              SelectionChanged="CbCloseBehavior_SelectionChanged">
+                                        <ComboBoxItem Content="结束程序" Tag="Exit" IsSelected="True"/>
+                                        <ComboBoxItem Content="最小化到系统托盘" Tag="Tray"/>
+                                    </ComboBox>
+                                    <TextBlock Text="选择「最小化到系统托盘」后，关闭时将隐藏到右下角托盘区"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TextMuted}" FontSize="10"
+                                               Margin="8,0,0,0"/>
+                                </WrapPanel>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- ============ Tab 3: 智能操作 ============ -->
+                    <TabItem Header="智能操作">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 新版本统一存放路径 + 扫描模式 -->
+                            <Border Grid.Row="0" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,6"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <!-- 第一行：新版本路径 -->
+                                    <WrapPanel Grid.Row="0" Margin="0,0,0,2">
+                                        <TextBlock Text="新版本统一存放路径:"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource AccentColor}" FontWeight="Bold"
+                                                   FontSize="12" Margin="2,0,8,0"/>
+                                        <TextBox x:Name="TxtSmartSourcePath" Text="" Height="24"
+                                                 FontSize="11" VerticalAlignment="Center"
+                                                 Width="400"/>
+                                        <Button x:Name="BtnSmartBrowseSource"
+                                                Content="浏览" Style="{StaticResource SmallTagButton}"
+                                                Background="{DynamicResource AccentColor}"
+                                                Click="BtnSmartBrowseSource_Click" Margin="6,0,0,0"/>
+                                    </WrapPanel>
+                                    <!-- 新版本路径说明 -->
+                                    <TextBlock Grid.Row="1" Text="选择外层的总目录，系统会自动搜索其下所有子文件夹内的EXE文件（如：AAA-程序更新/叠台 - 更新设备版本/IVision_EVSR - exe - V26.06.22.1/）"
+                                               Foreground="{DynamicResource TextMuted}" FontSize="10"
+                                               Margin="6,0,0,4"/>
+                                    <!-- 快捷方式创建选项 -->
+                                    <WrapPanel Grid.Row="2" Margin="0,0,0,2">
+                                        <CheckBox x:Name="ChkSmartAutoShortcut" Content="更新完成后自动创建快捷方式"
+                                                  IsChecked="True"
+                                                  Foreground="{DynamicResource PageText}"
+                                                  FontSize="11" VerticalAlignment="Center" Margin="2,0,0,0"/>
+                                    </WrapPanel>
+                                    <!-- 扫描模式 -->
+                                    <WrapPanel Grid.Row="3" Margin="0,0,0,2">
+                                        <TextBlock Text="扫描模式:"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource TextSecondary}" FontSize="11"
+                                                   Margin="2,0,6,0"/>
+                                        <RadioButton x:Name="RbtnSmartRemoteMode" Content="远程(使用参数配置表中的路径)"
+                                                     GroupName="SmartScanMode"
+                                                     IsChecked="True"
+                                                     Foreground="{DynamicResource PageText}"
+                                                     FontSize="11" VerticalAlignment="Center"
+                                                     Margin="2,0,10,0"
+                                                     Checked="RbtnSmartScanMode_Checked"/>
+                                        <RadioButton x:Name="RbtnSmartLocalMode" Content="本机测试"
+                                                     GroupName="SmartScanMode"
+                                                     Foreground="{DynamicResource PageText}"
+                                                     FontSize="11" VerticalAlignment="Center"
+                                                     Checked="RbtnSmartScanMode_Checked"/>
+                                        <TextBox x:Name="TxtSmartLocalRoot" Text="" Height="22"
+                                                 FontSize="11" VerticalAlignment="Center"
+                                                 Width="250" IsEnabled="False"
+                                                 Margin="6,0,0,0"/>
+                                        <Button x:Name="BtnSmartBrowseLocalRoot"
+                                                Content="浏览" Style="{StaticResource SmallTagButton}"
+                                                Background="{DynamicResource AccentColor}"
+                                                Click="BtnSmartBrowseLocalRoot_Click"
+                                                Margin="4,0,0,0" IsEnabled="False"/>
+                                    </WrapPanel>
+                                    <!-- 扫描模式说明 -->
+                                    <TextBlock Grid.Row="4" Text="本机测试时选择含有工位子文件夹的总目录，每个子文件夹名需与参数设定中的「工位文件夹名称要求」一致（如：CCD程序/阳极瑕疵/IVision_CHKR_Yang - Vxx/）"
+                                               Foreground="{DynamicResource TextMuted}" FontSize="10"
+                                               Margin="6,0,0,0"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- 操作按钮区 -->
+                            <WrapPanel Grid.Row="1" Margin="0,0,0,4">
+                                <Button x:Name="BtnSmartScanAll"
+                                        Content="一键扫描所有工位"
+                                        Height="32" FontSize="13" FontWeight="Bold"
+                                        Padding="16,0"
+                                        Foreground="{DynamicResource PageText}"
+                                        Background="{DynamicResource SuccessColor}"
+                                        BorderThickness="0" Cursor="Hand"
+                                        Click="BtnSmartScanAll_Click"
+                                        Margin="3,0,10,0"/>
+                                <Button x:Name="BtnSmartUpdateAll"
+                                        Content="一键更新所有过期工位"
+                                        Height="32" FontSize="13" FontWeight="Bold"
+                                        Padding="16,0"
+                                        Foreground="{DynamicResource PageText}"
+                                        Background="Orange"
+                                        BorderThickness="0" Cursor="Hand"
+                                        Click="BtnSmartUpdateAll_Click"
+                                        Margin="3,0,10,0"
+                                        IsEnabled="False"/>
+                                <Rectangle Width="1" Height="24" Fill="{DynamicResource BorderColor}"
+                                           VerticalAlignment="Center" Margin="5,0"/>
+                                <TextBlock Text="绿色=最新，红色=可更新，灰色=未检测到新版本"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            </WrapPanel>
+
+                            <!-- 监听模式 -->
+                            <Border Grid.Row="2" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <WrapPanel>
+                                    <ToggleButton x:Name="TogSmartWatch"
+                                                  Content="启用监听模式"
+                                                  Width="120" Height="26"
+                                                  FontSize="11" FontWeight="Bold"
+                                                  Foreground="{DynamicResource PageText}"
+                                                  Background="{DynamicResource AccentColor}"
+                                                  BorderThickness="0" Cursor="Hand"
+                                                  Checked="TogSmartWatch_Checked"
+                                                  Unchecked="TogSmartWatch_Unchecked"
+                                                  Margin="2,0,8,0"/>
+                                    <TextBlock x:Name="TxtSmartWatchStatus"
+                                               Text="监听已关闭"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               FontSize="11" VerticalAlignment="Center"/>
+                                    <Rectangle Width="1" Height="20" Fill="{DynamicResource BorderColor}"
+                                               VerticalAlignment="Center" Margin="8,0"/>
+                                    <TextBlock Text="开启后自动监视新版本目录，检测到新EXE文件时自动扫描所有工位并进行更新"
+                                               Foreground="{DynamicResource TextMuted}"
+                                               FontSize="10" VerticalAlignment="Center"/>
+                                </WrapPanel>
+                            </Border>
+
+                            <!-- 扫描结果表格 -->
+                            <Border Grid.Row="3" Style="{StaticResource SectionBorderStyle}"
+                                    Background="{DynamicResource SideBarBg}">
+                                <DataGrid x:Name="DataGridSmartScan"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          HeadersVisibility="Column"
+                                          RowHeaderWidth="0"
+                                          Background="{DynamicResource InputBg}"
+                                          Foreground="{DynamicResource PageText}"
+                                          BorderThickness="0"
+                                          FontSize="11"
+                                          RowHeight="30"
+                                          SelectionMode="Single"
+                                          SelectionUnit="FullRow"
+                                          GridLinesVisibility="Horizontal"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <DataGrid.Resources>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentColor}"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="Background" Value="{DynamicResource SideBarBg}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                            <Setter Property="Height" Value="28"/>
+                                        </Style>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="2,0"/>
+                                        </Style>
+                                    </DataGrid.Resources>
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Header="选择" Width="40">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              IsEnabled="{Binding CanUpdate}"
+                                                              VerticalAlignment="Center"
+                                                              HorizontalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="工位" Binding="{Binding StationName}" Width="100" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="EXE程序" Binding="{Binding ExeName}" Width="120" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="当前版本(A)" Binding="{Binding CurrentVersion, StringFormat='V{0}'}" Width="100" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="新版本(B)" Binding="{Binding NewVersion, StringFormat='V{0}'}" Width="100" IsReadOnly="True"/>
+                                        <DataGridTemplateColumn Header="版本对比" Width="120">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding CompareText}"
+                                                               Foreground="{Binding CompareColor}"
+                                                               FontWeight="Bold"
+                                                               VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="状态" Width="140">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding StatusText}"
+                                                               Foreground="{Binding StatusColor}"
+                                                               VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="待更新程序位置" Binding="{Binding CurrentExePath}" Width="*" MinWidth="150" IsReadOnly="True"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+
+                            <!-- 更新日志 -->
+                            <Border Grid.Row="4" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,4"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3"
+                                    MaxHeight="120">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="更新日志"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               FontSize="10" Margin="0,0,0,2"/>
+                                    <TextBox x:Name="TxtSmartLog" Grid.Row="1"
+                                             Text="" FontSize="9"
+                                             Background="{DynamicResource InputBg}"
+                                             Foreground="{DynamicResource PageText}"
+                                             BorderThickness="0"
+                                             IsReadOnly="True"
+                                             TextWrapping="Wrap"
+                                             VerticalScrollBarVisibility="Auto"
+                                             HorizontalScrollBarVisibility="Disabled"
+                                             Padding="2"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- 底部摘要 -->
+                            <Border Grid.Row="5" Style="{StaticResource SectionBorderStyle}" Margin="0,6,0,0"
+                                    Background="{DynamicResource SideBarBg}" Padding="6,3">
+                                <TextBlock x:Name="TxtSmartSummary"
+                                           Text="就绪"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           FontSize="11"/>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <!-- ===== 底部状态栏 ===== -->
+        <Border Grid.Row="2" Style="{StaticResource SectionBorderStyle}" Margin="0,8,0,0"
+                Background="{DynamicResource SideBarBg}" Padding="8,4"
+                BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderColor}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" x:Name="TxtStatusBar"
+                           Text="就绪" Foreground="{DynamicResource TextSecondary}" FontSize="11"/>
+                <TextBlock Grid.Column="1" x:Name="TxtDirCount"
+                           Text="工位: 0 | 程序: 0"
+                           Foreground="{DynamicResource TextMuted}" FontSize="11"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
