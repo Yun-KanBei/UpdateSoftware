@@ -1,0 +1,104 @@
+﻿<Application x:Class="UpdateSoftware.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UpdateSoftware">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- ========================================================== -->
+            <!-- 背景色 -->
+            <!-- ========================================================== -->
+            <SolidColorBrush x:Key="PrimaryBackgroundColor" Color="#121212"/>
+            <SolidColorBrush x:Key="SecundaryBackgroundColor" Color="#1E1E1E"/>
+            <SolidColorBrush x:Key="TertiaryBackgroundColor" Color="#2C2C2C"/>
+
+            <!-- 文字色 -->
+            <SolidColorBrush x:Key="PrimaryTextColor" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="SecundaryTextColor" Color="#B0B0B0"/>
+            <SolidColorBrush x:Key="TertiaryTextColor" Color="#888888"/>
+            <SolidColorBrush x:Key="OpacityTextColor" Color="#FFFFFF" Opacity="0.1"/>
+
+            <!-- 蓝色系 -->
+            <SolidColorBrush x:Key="PrimaryBlueColor" Color="#409EFF"/>
+            <SolidColorBrush x:Key="SecundaryBlueColor" Color="#0063F7"/>
+            <SolidColorBrush x:Key="TertiaryBlueColor" Color="#5B8DEF"/>
+            <SolidColorBrush x:Key="OpacityBlueColor" Color="#5B8DEF" Opacity="0.3"/>
+
+            <!-- 红色系 -->
+            <SolidColorBrush x:Key="PrimaryRedColor" Color="#E63535"/>
+            <SolidColorBrush x:Key="SecundaryRedColor" Color="#FF3B3B"/>
+            <SolidColorBrush x:Key="TertiaryRedColor" Color="#FF5C5C"/>
+            <SolidColorBrush x:Key="OpacityRedColor" Color="#FF5C5C" Opacity="0.3"/>
+
+            <!-- 绿色系 -->
+            <SolidColorBrush x:Key="PrimaryGreenColor" Color="#05A660"/>
+            <SolidColorBrush x:Key="SecundaryGreenColor" Color="#06C270"/>
+            <SolidColorBrush x:Key="TertiaryGreenColor" Color="#39D98A"/>
+            <SolidColorBrush x:Key="OpacityGreenColor" Color="#39D98A" Opacity="0.3"/>
+
+            <!-- 橙色系 -->
+            <SolidColorBrush x:Key="PrimaryOrangeColor" Color="#E67A00"/>
+            <SolidColorBrush x:Key="SecundaryOrangeColor" Color="#FF8800"/>
+            <SolidColorBrush x:Key="TertiaryOrangeColor" Color="#FDAC42"/>
+            <SolidColorBrush x:Key="OpacityOrangeColor" Color="#FDAC42" Opacity="0.3"/>
+
+            <!-- 黄色系 -->
+            <SolidColorBrush x:Key="PrimaryYellowColor" Color="#E6B800"/>
+            <SolidColorBrush x:Key="SecundaryYellowColor" Color="#FFCC00"/>
+            <SolidColorBrush x:Key="TertiaryYellowColor" Color="#FDDD48"/>
+            <SolidColorBrush x:Key="OpacityYellowColor" Color="#FDDD48" Opacity="0.3"/>
+
+            <!-- 青色系 -->
+            <SolidColorBrush x:Key="PrimaryTealColor" Color="#00B7C4"/>
+            <SolidColorBrush x:Key="SecundaryTealColor" Color="#00CFDE"/>
+            <SolidColorBrush x:Key="TertiaryTealColor" Color="#73DFE7"/>
+            <SolidColorBrush x:Key="OpacityTealColor" Color="#73DFE7" Opacity="0.3"/>
+
+            <!-- 兼容旧版颜色键 -->
+            <SolidColorBrush x:Key="Transparent" Color="Transparent"/>
+            <SolidColorBrush x:Key="PageText" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="TextSecondary" Color="#B0B0B0"/>
+            <SolidColorBrush x:Key="TextMuted" Color="#888888"/>
+            <SolidColorBrush x:Key="ControlBg" Color="#2C2C2C"/>
+            <SolidColorBrush x:Key="SideBarBg" Color="#1E1E1E"/>
+            <SolidColorBrush x:Key="InputBg" Color="#2C2C2C"/>
+            <SolidColorBrush x:Key="BorderColor" Color="#2C2C2C"/>
+            <SolidColorBrush x:Key="AccentColor" Color="#409EFF"/>
+            <SolidColorBrush x:Key="SuccessColor" Color="#05A660"/>
+            <SolidColorBrush x:Key="DangerColor" Color="#E63535"/>
+
+            <!-- 全局 ComboBox 样式 -->
+            <Style x:Key="BaseComboBoxStyle" TargetType="ComboBox">
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="BorderBrush" Value="#CCCCCC"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="6,2"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="MinHeight" Value="26"/>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="Padding" Value="6,4"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#E6F0FF"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#E67A00"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Trigger>
+                                <Trigger Property="IsHighlighted" Value="True">
+                                    <Setter Property="Background" Value="#E6F0FF"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

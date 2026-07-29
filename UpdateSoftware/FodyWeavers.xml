@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
+	<Costura>
+		<IncludeAssemblies>
+			Newtonsoft.Json
+			Costura
+
+			System.Buffers
+			System.Memory
+			System.Numerics.Vectors
+			System.Runtime.CompilerServices.Unsafe
+
+			Wpf.Ui.Abstractions
+			Wpf.Ui
+		</IncludeAssemblies>
+	</Costura>
+</Weavers>
