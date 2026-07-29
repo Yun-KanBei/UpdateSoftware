@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:UpdateSoftware.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="1100"
       Title="UpdateEXE"
@@ -11,133 +12,178 @@
       Foreground="{DynamicResource PageText}">
 
     <Page.Resources>
+        <!-- ===== 隐式 ComboBox 样式（基于 App.xaml 中的 BaseComboBoxStyle） ===== -->
+        <Style TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
+
         <!-- ===== 基础样式 ===== -->
         <Style x:Key="SectionBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource ControlBg}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12"/>
         </Style>
 
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
             <Setter Property="Margin" Value="0,0,0,8"/>
         </Style>
 
-        <!-- ===== 按钮样式（含 Hover/Pressed 反馈） ===== -->
+        <!-- ===== Element Plus 风格按钮（主操作） ===== -->
         <Style TargetType="Button" x:Key="ActionButton">
             <Setter Property="Height" Value="30"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryBlueColor}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="RenderTransform">
+            <Setter Property="Template">
                 <Setter.Value>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="RootBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}"
+                                Height="{TemplateBinding Height}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="RootBorder" Property="Background" Value="#66B1FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="RootBorder" Property="Background" Value="#3A8EE6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="RootBorder" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Opacity" Value="0.85"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Opacity" Value="0.7"/>
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="0.97" ScaleY="0.97"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.4"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <Style TargetType="Button" x:Key="DangerButton" BasedOn="{StaticResource ActionButton}">
-            <Setter Property="Background" Value="{DynamicResource DangerColor}"/>
-        </Style>
-
-        <Style TargetType="Button" x:Key="SuccessButton" BasedOn="{StaticResource ActionButton}">
-            <Setter Property="Background" Value="{DynamicResource SuccessColor}"/>
-        </Style>
-
-        <Style TargetType="Button" x:Key="SmallTagButton">
-            <Setter Property="Height" Value="22"/>
-            <Setter Property="Padding" Value="6,0"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="10"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="RenderTransform">
-                <Setter.Value>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{DynamicResource PrimaryRedColor}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Opacity" Value="0.85"/>
+                    <Setter Property="Background" Value="#FF5C5C"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Opacity" Value="0.7"/>
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="0.96" ScaleY="0.96"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.4"/>
+                    <Setter Property="Background" Value="#CC2F2F"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- ===== 输入框样式 ===== -->
+        <Style TargetType="Button" x:Key="SuccessButton" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="{DynamicResource PrimaryGreenColor}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#06C270"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#04874D"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="WarningButton" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="{DynamicResource PrimaryOrangeColor}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF8800"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#CC6B00"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="SmallTagButton">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryBlueColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="RootBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}"
+                                Height="{TemplateBinding Height}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="RootBorder" Property="Background" Value="#66B1FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="RootBorder" Property="Background" Value="#3A8EE6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="RootBorder" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===== 输入框样式（Element Plus 风格） ===== -->
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="Padding" Value="6,4"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="CaretBrush" Value="{DynamicResource PageText}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource PrimaryBlueColor}"/>
             <Style.Triggers>
                 <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColor}"/>
-                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBlueColor}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBlueColor}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <Style TargetType="PasswordBox">
-            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="Padding" Value="6,4"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="CaretBrush" Value="{DynamicResource PageText}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource PrimaryBlueColor}"/>
             <Style.Triggers>
                 <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBlueColor}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBlueColor}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <!-- ===== ListBox 样式 ===== -->
         <Style TargetType="ListBox">
-            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
         <!-- ===== 暗色滚动条样式 ===== -->
@@ -183,41 +229,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="ScrollViewer">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ScrollViewer">
-                        <Grid>
-                            <ScrollContentPresenter CanContentScroll="{TemplateBinding CanContentScroll}"
-                                                    Margin="{TemplateBinding Padding}"/>
-                            <ScrollBar x:Name="PART_VerticalScrollBar" Style="{StaticResource DarkScrollBarStyle}"
-                                       Orientation="Vertical" HorizontalAlignment="Right"
-                                       Value="{TemplateBinding VerticalOffset}"
-                                       Maximum="{TemplateBinding ScrollableHeight}"
-                                       ViewportSize="{TemplateBinding ViewportHeight}"
-                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
-                            <ScrollBar x:Name="PART_HorizontalScrollBar" Style="{StaticResource DarkScrollBarStyle}"
-                                       Orientation="Horizontal" VerticalAlignment="Bottom"
-                                       Value="{TemplateBinding HorizontalOffset}"
-                                       Maximum="{TemplateBinding ScrollableWidth}"
-                                       ViewportSize="{TemplateBinding ViewportWidth}"
-                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
         <!-- ===== TreeViewItem 样式 ===== -->
         <Style TargetType="TreeViewItem">
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="2,3"/>
+            <Setter Property="Padding" Value="4,4"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="Background" Value="{DynamicResource PrimaryBlueColor}"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -229,55 +251,34 @@
         <!-- ===== DataGrid 默认行悬停样式 ===== -->
         <Style TargetType="DataGridRow">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#3A3A3E"/>
+                    <Setter Property="Background" Value="{DynamicResource OpacityBlueColor}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                    <Setter Property="Background" Value="{DynamicResource PrimaryBlueColor}"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- ===== ComboBox 样式 ===== -->
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="4,2"/>
-            <Setter Property="FontSize" Value="12"/>
-        </Style>
-        <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="{DynamicResource InputBg}"/>
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#4A4A4E"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <!-- ===== ComboBox 样式（使用 App.xaml 中的全局样式） ===== -->
 
         <!-- ===== CheckBox 样式 ===== -->
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
                         <WrapPanel>
-                            <Grid Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,4,0">
-                                <Rectangle Name="CheckBoxBorder" Fill="{DynamicResource ControlBg}" Stroke="{DynamicResource TextSecondary}" StrokeThickness="1"
-                                           RadiusX="2" RadiusY="2"/>
-                                <Path Name="CheckMark" Data="M3,8 L7,12 L13,4" Stroke="{DynamicResource PageText}" StrokeThickness="2"
+                            <Grid Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,6,0">
+                                <Rectangle Name="CheckBoxBorder" Fill="{DynamicResource TertiaryBackgroundColor}" Stroke="{DynamicResource SecundaryTextColor}" StrokeThickness="1.5"
+                                           RadiusX="4" RadiusY="4"/>
+                                <Path Name="CheckMark" Data="M3,8 L7,12 L13,4" Stroke="{DynamicResource PrimaryTextColor}" StrokeThickness="2"
                                       StrokeLineJoin="Round" StrokeEndLineCap="Round" StrokeStartLineCap="Round"
                                       Visibility="Collapsed"/>
                             </Grid>
@@ -344,6 +345,10 @@
 <Border Grid.Row="0" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,8"
 Background="{DynamicResource SideBarBg}">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -351,25 +356,42 @@ Background="{DynamicResource SideBarBg}">
                 </Grid.ColumnDefinitions>
                 <!-- 标题 + 换肤按钮 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="EXE版本管理工具"
-                               FontSize="16" FontWeight="Bold"
-                               Foreground="{DynamicResource AccentColor}"
-                               VerticalAlignment="Center" Margin="5,0,4,0"/>
-                    <Button x:Name="BtnThemeSwitch"
-                            Content="👚" FontSize="16"
-                            Width="30" Height="26"
+                    <Button x:Name="BtnOpenHelp"
+                            Content="使用说明"
+                            FontSize="16" FontWeight="Bold"
+                            Foreground="{DynamicResource AccentColor}"
                             Background="Transparent"
-                            Foreground="{DynamicResource TextSecondary}"
                             BorderThickness="0"
                             Cursor="Hand"
-                            Click="BtnThemeCycle_Click"
-                            ToolTip="切换夜间/日间模式"/>
+                            Padding="5,0,2,0"
+                            VerticalAlignment="Center"
+                            ToolTip="点击查看使用说明文档"
+                            Click="BtnOpenHelp_Click"/>
+                    <Button x:Name="BtnThemeSwitch" Margin="0,-2,0,0"
+                             Content="👚" FontSize="16"
+                             Width="30" Height="26"
+                             Background="Transparent"
+                             Foreground="{DynamicResource TextMuted}"
+                             BorderThickness="0"
+                             Cursor="Hand"
+                             Click="BtnThemeCycle_Click"
+                             ToolTip="切换夜间/日间模式"
+                             Padding="0"
+                             VerticalAlignment="Center"/>
+                    <Button x:Name="BtnOpenVersionLog"
+                            Content="Version 10.0"
+                            FontSize="10" FontWeight="Bold"
+                            Foreground="{DynamicResource TextSecondary}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Padding="0,8,4,0"
+                            VerticalAlignment="Center"
+                            ToolTip="查看更新日志"
+                            Click="BtnOpenVersionLog_Click"/>
+                   
                 </StackPanel>
-                <TextBlock x:Name="TxtAuthUser" Grid.Column="1"
-                           FontSize="13" FontWeight="Bold"
-                           Foreground="#FFA500" VerticalAlignment="Center"
-                           Margin="8,0,0,0"/>
-                <WrapPanel Grid.Column="2" Margin="0,0,5,0">
+                <WrapPanel Grid.Column="2" Margin="0,0,5,0" HorizontalAlignment="Right">
                     <TextBlock Text="设备号:" VerticalAlignment="Center"
                                Foreground="{DynamicResource TextSecondary}" Margin="5,0" FontSize="11"/>
                     <TextBox x:Name="TxtDeviceNumber" Width="80" Height="22"
@@ -379,32 +401,63 @@ Background="{DynamicResource SideBarBg}">
                     <CheckBox x:Name="ChkUseDevicePrefix" Content="启用设备号"
                               IsChecked="True" Foreground="{DynamicResource PageText}"
                               VerticalAlignment="Center" Margin="8,0,2,0" FontSize="11"/>
-                    <TextBlock Text="（创建目录/扫描时 以'设备号#'作为工位名称文件夹前缀）"
+                    <TextBlock Text="（以'设备号#'作为工位名称文件夹前缀）"
                                Foreground="{DynamicResource TextMuted}"
                                FontSize="10" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <Rectangle Width="1" Height="22" Fill="{DynamicResource BorderColor}"
                                VerticalAlignment="Center" Margin="5,0"/>
-                    <Button x:Name="BtnAuth"
-                            Content="身份验证" Style="{StaticResource SmallTagButton}"
-                            Background="OrangeRed"
-                            Click="BtnAuth_Click" Margin="2,0"/>
-                    <Button x:Name="BtnSaveConfig"
+                    <Button x:Name="BtnSaveConfig" Width="80"
                             Content="保存参数" Style="{StaticResource SmallTagButton}"
                             Background="{DynamicResource SuccessColor}"
                             Click="BtnSaveConfig_Click" Margin="2,0"/>
-                    <Button x:Name="BtnLoadConfig"
+                    <Button x:Name="BtnLoadConfig" Width="80"
                             Content="读取配置" Style="{StaticResource SmallTagButton}"
                             Click="BtnLoadConfig_Click" Margin="2,0"/>
-                    <Button x:Name="BtnCreateShortcut"
-                            Content="为所选程序创建快捷方式"
-                            Style="{StaticResource SmallTagButton}"
-                            Background="Orange"
-                            Click="BtnCreateShortcut_Click"
-                            Margin="2,0"/>
+                </WrapPanel>
+                <!-- 第二行：快捷方式相关控件靠右 -->
+                <WrapPanel Grid.Row="1" Grid.Column="0" Margin="5,4,0,0"
+                           VerticalAlignment="Center">
+                    <Button x:Name="BtnAuth" FontWeight="Bold"  FontSize="13"
+                            Content="身份验证" Style="{StaticResource SmallTagButton}"
+                            Background="Red" Width="88"
+                            Click="BtnAuth_Click" Margin="2,0"/>
+                    <TextBlock x:Name="TxtAuthUser"
+                               FontSize="13" FontWeight="Bold"
+                               Foreground="#FFA500" VerticalAlignment="Center"
+                               Margin="4,0,0,0"/>
+                </WrapPanel>
+                <WrapPanel Grid.Row="1" Grid.Column="2" Margin="0,4,5,0"
+                           HorizontalAlignment="Right">
+                    <Button x:Name="BtnCreateShortcut" Width="122"
+                             Content="为所选程序创建快捷方式"
+                             Style="{StaticResource SmallTagButton}"
+                             Background="Orange"
+                             Click="BtnCreateShortcut_Click"
+                             Margin="10,0"/>
+                    <CheckBox x:Name="ChkDeleteOldShortcut"
+                              Content="删除旧版快捷方式"
+                              Foreground="{DynamicResource PageText}"
+                              FontSize="11"
+                              VerticalAlignment="Center"
+                              Margin="2,0,4,0"/>
+                    <WrapPanel VerticalAlignment="Center" Margin="2,0,4,0">
+                        <RadioButton x:Name="RbtnLocalShortcut" Content="本机地址" Width="68.5"
+                                     GroupName="ShortcutMode"
+                                     IsChecked="True"
+                                     FontSize="11" VerticalAlignment="Center"
+                                     Margin="2,0,6,0"
+                                     Checked="RbtnShortcutMode_Checked"/>
+                        <RadioButton x:Name="RbtnRemoteShortcut" Content="访问主机" Width="68.5"
+                                     GroupName="ShortcutMode"
+                                     FontSize="11" VerticalAlignment="Center"
+                                     Checked="RbtnShortcutMode_Checked"/>
+                    </WrapPanel>
+                   
+                    <Rectangle Width="1" Height="22" Fill="{DynamicResource BorderColor}" VerticalAlignment="Center" Margin="5,0"/>
                     <Button x:Name="BtnFixFolderName"
                             Content="按定义规则命名选中文件夹名称"
                             Style="{StaticResource SmallTagButton}"
-                            Background="Orange"
+                            Background="Orange" Width="164"
                             Click="BtnFixFolderName_Click"
                             Margin="2,0"/>
                 </WrapPanel>
@@ -414,7 +467,7 @@ Background="{DynamicResource SideBarBg}">
         <!-- ===== 主内容区域 ===== -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="300" MinWidth="300"/>
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -423,7 +476,7 @@ Background="{DynamicResource SideBarBg}">
             <Border x:Name="BorderAuthOverlay"
                     Background="#AA1E1E1E"
                     Panel.ZIndex="10" Visibility="Visible"
-                    Grid.ColumnSpan="3">
+                    Grid.Column="2">
                 <Grid>
                     <Border Background="#2D2D30" CornerRadius="8"
                             Width="320" Height="140"
@@ -457,6 +510,7 @@ Background="{DynamicResource SideBarBg}">
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="程序目录结构"
@@ -478,7 +532,7 @@ Background="{DynamicResource SideBarBg}">
                                 <RadioButton x:Name="RbtnRemoteMode" Content="非本机地址"
                                              GroupName="AccessMode"
                                              Foreground="{DynamicResource PageText}"
-                                             FontSize="11" VerticalAlignment="Center"
+                                             FontSize="11" VerticalAlignment="Center" 
                                              Checked="RbtnAccessMode_Checked"/>
                             </WrapPanel>
                             <!-- 第二行：路径输入 + 浏览/访问按钮 -->
@@ -489,12 +543,12 @@ Background="{DynamicResource SideBarBg}">
                                          Click="BtnAccessPath_Click" Margin="5,0,0,0" MinWidth="48"/>
                                 <!-- 本机模式：TextBox -->
                                 <TextBox x:Name="TxtBasePath" Text="" Height="22" Margin="10,0,0,0"
-                                         FontSize="11" VerticalAlignment="Center"
+                                         FontSize="11" VerticalAlignment="Center" 
                                          Width="200"/>
                                 <!-- 非本机模式：可编辑下拉框（默认隐藏） -->
-                                <ComboBox x:Name="CbRemotePath" IsEditable="True" Height="22"
+                                <ComboBox x:Name="CbRemotePath" IsEditable="True" Height="22" 
                                           FontSize="11" VerticalAlignment="Center"  Margin="10,0,0,0"
-                                          Width="180" Visibility="Collapsed"/>
+                                          Width="200" Visibility="Collapsed"/>
 
                             </WrapPanel>
                         </StackPanel>
@@ -536,8 +590,17 @@ Background="{DynamicResource SideBarBg}">
                                  Background="Transparent"
                                  Foreground="{DynamicResource TextSecondary}"
                                  BorderThickness="0" IsReadOnly="True"
-                                 TextWrapping="NoWrap" Padding="0,0,0,2"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                                 TextWrapping="NoWrap" Padding="0,0,0,2"/>
+                    </Border>
+
+                    <!-- 选中文件夹内匹配的EXE名称及版本号显示 -->
+                    <Border Grid.Row="5" Style="{StaticResource SectionBorderStyle}" Margin="0,4,0,0"
+                            Background="{DynamicResource SideBarBg}" Padding="4,2"
+                            MinHeight="20" MaxHeight="60">
+                        <TextBlock x:Name="TxtMatchedExeInfo" Text=""
+                                   FontSize="10" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   TextWrapping="Wrap"/>
                     </Border>
                 </Grid>
             </Border>
@@ -680,23 +743,46 @@ Background="{DynamicResource SideBarBg}">
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Resources>
                                             <Style TargetType="DataGridColumnHeader">
-                                                <Setter Property="Background" Value="{DynamicResource ControlBg}"/>
-                                                <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                                <Setter Property="Background" Value="{DynamicResource SecundaryBackgroundColor}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource SecundaryTextColor}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
                                                 <Setter Property="FontSize" Value="10"/>
                                                 <Setter Property="FontWeight" Value="Bold"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                                             </Style>
                                             <Style TargetType="DataGridCell">
-                                                <Setter Property="Background" Value="{DynamicResource InputBg}"/>
-                                                <Setter Property="Foreground" Value="{DynamicResource PageText}"/>
-                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                                <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBackgroundColor}"/>
                                                 <Setter Property="FontSize" Value="10"/>
                                                 <Setter Property="VerticalAlignment" Value="Center"/>
                                                 <Style.Triggers>
                                                     <Trigger Property="IsSelected" Value="True">
-                                                        <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource PrimaryBlueColor}"/>
                                                         <Setter Property="Foreground" Value="White"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                            <!-- DataGrid 内 ComboBox 跟随 DataGrid 文字颜色 -->
+                                            <Style TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}">
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+                                                <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+                                            </Style>
+                                            <Style TargetType="ComboBoxItem">
+                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+                                                <Setter Property="Background" Value="{DynamicResource TertiaryBackgroundColor}"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource OpacityBlueColor}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Background" Value="#E67A00"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsHighlighted" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource OpacityBlueColor}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextColor}"/>
                                                     </Trigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -1108,11 +1194,11 @@ Background="{DynamicResource SideBarBg}">
                                     <DataGridTextColumn Header="程序快捷方式命名与扫描规则" Binding="{Binding ShortcutNamingRule, Mode=TwoWay}"
                                                         Width="Auto" MinWidth="120" MaxWidth="250"/>
                                     <DataGridTextColumn Header="发送快捷方式地址" Binding="{Binding ShortcutDestPath, Mode=TwoWay}"
-                                                        Width="Auto" MinWidth="100" MaxWidth="200"/>
+                                                        Width="Auto" MinWidth="100" />
                                     <DataGridTextColumn Header="远程账户" Binding="{Binding RemoteAccount, Mode=TwoWay}"
-                                                        Width="120"/>
+                                                        Width="Auto" MinWidth="120"/>
                                     <DataGridTextColumn Header="远程密码" Binding="{Binding RemotePassword, Mode=TwoWay}"
-                                                        Width="100"/>
+                                                        Width="Auto" MinWidth="100"/>
                                     <DataGridTextColumn Header="远程访问地址" Binding="{Binding RemotePath, Mode=TwoWay}"
                                                         Width="Auto" MinWidth="140" MaxWidth="300"/>
                                 </DataGrid.Columns>
@@ -1122,7 +1208,7 @@ Background="{DynamicResource SideBarBg}">
                             <Border Grid.Row="2" Style="{StaticResource SectionBorderStyle}" Margin="0,0,0,6"
                                     Background="{DynamicResource SideBarBg}" Padding="6,3">
                                 <WrapPanel>
-                                    <TextBlock Text="程序快捷方式创建地址:"
+                                    <TextBlock Text="本机快捷方式创建地址:"
                                                VerticalAlignment="Center"
                                                Foreground="{DynamicResource TextSecondary}" FontSize="11"
                                                Margin="2,0,6,0"/>
@@ -1198,7 +1284,7 @@ Background="{DynamicResource SideBarBg}">
                                                Foreground="{DynamicResource TextSecondary}" FontSize="11"
                                                Margin="2,0,6,0"/>
                                     <ComboBox x:Name="CbCloseBehavior" Width="180" Height="22" FontSize="11"
-                                              VerticalAlignment="Center"
+                                              VerticalAlignment="Center" 
                                               SelectionChanged="CbCloseBehavior_SelectionChanged">
                                         <ComboBoxItem Content="结束程序" Tag="Exit" IsSelected="True"/>
                                         <ComboBoxItem Content="最小化到系统托盘" Tag="Tray"/>
@@ -1243,7 +1329,9 @@ Background="{DynamicResource SideBarBg}">
                                                    FontSize="12" Margin="2,0,8,0"/>
                                         <TextBox x:Name="TxtSmartSourcePath" Text="" Height="24"
                                                  FontSize="11" VerticalAlignment="Center"
-                                                 Width="400"/>
+                                                 Width="400" AllowDrop="True"
+                                                 PreviewDragOver="TxtSmartSourcePath_PreviewDragOver"
+                                                 Drop="TxtSmartSourcePath_Drop"/>
                                         <Button x:Name="BtnSmartBrowseSource"
                                                 Content="浏览" Style="{StaticResource SmallTagButton}"
                                                 Background="{DynamicResource AccentColor}"

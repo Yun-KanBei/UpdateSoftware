@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -52,6 +52,10 @@ namespace UpdateSoftware.Pages
         private static string DefaultConfigPath => System.IO.Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "UpdateSoftware_Config", "Param.json");
+        /// <summary>配置路径指针文件（%APPDATA%\\UpdateSoftware\\config_pointer.json，记录自定义配置文件路径）</summary>
+        private static string AppDataConfigPointer => System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "UpdateSoftware", "config_pointer.json");
 
         public UpdateEXE()
         {
@@ -73,14 +77,17 @@ namespace UpdateSoftware.Pages
             // 自动识别本机桌面路径作为快捷方式创建地址
             AutoDetectDesktopPath();
 
-            // 初始化新设备配置
-            InitDeviceConfig();
-
             // 初始化日志路径与配置文件路径（默认值）
             _logDirectoryPath = DefaultLogDir;
             _configFilePath = DefaultConfigPath;
             TxtLogPath.Text = _logDirectoryPath;
             TxtConfigPath.Text = _configFilePath;
+
+            // 初始化新设备配置
+            InitDeviceConfig();
+
+            // 启动时自动加载默认配置文件
+            AutoLoadDefaultConfig();
 
             // 加载关闭行为设置
             LoadCloseBehaviorSetting();
@@ -91,6 +98,100 @@ namespace UpdateSoftware.Pages
         {
             int next = (ThemeManager.CurrentIndex + 1) % ThemeManager.Themes.Length;
             ThemeManager.ApplyTheme(next);
+        }
+
+        /// <summary>快捷方式创建模式切换 → 使用本机地址 / 使用访问主机地址</summary>
+        private void RbtnShortcutMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (RbtnRemoteShortcut != null)
+                _useRemoteShortcutPath = RbtnRemoteShortcut.IsChecked == true;
+        }
+
+        /// <summary>点击标题「EXE版本管理工具 5.0」→ 打开嵌入的 HTML 使用说明文档</summary>
+        private void BtnOpenHelp_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 从嵌入资源中提取 HTML 文件
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var resourceName = "UpdateSoftware.程序更新工具-使用SOP.html";
+
+                string tempFile;
+                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream == null)
+                    {
+                        // 如果嵌入资源未找到，尝试直接打开源文件
+                        var fallbackPath = System.IO.Path.Combine(
+                            AppDomain.CurrentDomain.BaseDirectory, "程序更新工具-使用SOP.html");
+                        if (File.Exists(fallbackPath))
+                        {
+                            Process.Start(new ProcessStartInfo(fallbackPath) { UseShellExecute = true });
+                        }
+                        else
+                        {
+                            MessageBox.Show("未找到使用说明文档。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                        return;
+                    }
+
+                    tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "EXE版本工具_SOP.html");
+                    using (var fs = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
+                    {
+                        stream.CopyTo(fs);
+                    }
+                }
+
+                Process.Start(new ProcessStartInfo(tempFile) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开使用说明文档失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>点击 V8.0 版本号 → 打开更新日志</summary>
+        private void BtnOpenVersionLog_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 尝试从嵌入资源中提取更新日志
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var resourceName = "UpdateSoftware.更新日志.txt";
+
+                string tempFile;
+                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream == null)
+                    {
+                        // 嵌入资源未找到，尝试直接打开源文件
+                        var fallbackPath = System.IO.Path.Combine(
+                            AppDomain.CurrentDomain.BaseDirectory, "更新日志.txt");
+                        if (File.Exists(fallbackPath))
+                        {
+                            Process.Start(new ProcessStartInfo(fallbackPath) { UseShellExecute = true });
+                        }
+                        else
+                        {
+                            MessageBox.Show("未找到更新日志文件。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        return;
+                    }
+
+                    // 提取到临时文件
+                    tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "EXE版本工具_更新日志.txt");
+                    using (var fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
+                    {
+                        stream.CopyTo(fileStream);
+                    }
+                }
+
+                Process.Start(new ProcessStartInfo(tempFile) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开更新日志失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>浏览日志目录</summary>
@@ -134,6 +235,7 @@ namespace UpdateSoftware.Pages
         {
             _configFilePath = DefaultConfigPath;
             TxtConfigPath.Text = _configFilePath;
+            DeleteConfigPointer();
         }
         /// <summary>打开日志目录</summary>
         private void BtnOpenLogDir_Click(object sender, RoutedEventArgs e)
@@ -157,13 +259,37 @@ namespace UpdateSoftware.Pages
             }
         }
 
-        /// <summary>初始化新设备配置</summary>
+        /// <summary>初始化新设备配置（从默认 Param.json 加载）</summary>
         private void InitDeviceConfig()
         {
             _deviceConfigRows = new ObservableCollection<DeviceConfigRow>();
             DataGridDeviceConfig.ItemsSource = _deviceConfigRows;
 
-            // 优先从合并的 Prpgram.json 加载
+            // 从默认 Param.json 加载设备配置
+            try
+            {
+                string defaultParamPath = System.IO.Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory, "UpdateSoftware_Config", "Param.json");
+                if (System.IO.File.Exists(defaultParamPath))
+                {
+                    string json = System.IO.File.ReadAllText(defaultParamPath);
+                    var combined = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                    if (combined != null && combined.TryGetValue("DeviceConfigRows", out object devObj) && devObj != null)
+                    {
+                        string devJson = devObj.ToString();
+                        var loaded = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DeviceConfigRow>>(devJson);
+                        if (loaded != null && loaded.Count > 0)
+                        {
+                            foreach (var item in loaded)
+                                _deviceConfigRows.Add(item);
+                            return;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // 兼容旧格式：从 KB_ToolsBox_Config\UpdateEXE\Prpgram.json 加载
             try
             {
                 string configDir = System.IO.Path.Combine(
@@ -498,6 +624,9 @@ namespace UpdateSoftware.Pages
         /// <summary>当前选中文件夹路径</summary>
         private string _currentSelectedFolderPath;
 
+        /// <summary>快捷方式创建模式：true=使用访问主机地址(ShortcutDestPath)，false=使用本机地址(TxtDesktopPath)</summary>
+        private bool _useRemoteShortcutPath;
+
         // ==================== 新设备配置相关字段 ====================
         /// <summary>新设备配置表格数据</summary>
         private ObservableCollection<DeviceConfigRow> _deviceConfigRows;
@@ -670,6 +799,9 @@ namespace UpdateSoftware.Pages
 
                 ItemsMatchedInfo.ItemsSource = displayItems;
 
+                // 更新选中文件夹内匹配的EXE名称及版本号
+                UpdateMatchedExeInfoText();
+
                 // 判断是否显示"修正文件夹命名"按钮
                 bool needRename = _currentMatchedInfos.Any(i => !i.IsNameMatch);
                 if (BtnRenameFolder != null)
@@ -737,6 +869,44 @@ namespace UpdateSoftware.Pages
             }
             if (BtnRenameFolder != null)
                 BtnRenameFolder.Visibility = Visibility.Collapsed;
+            if (TxtMatchedExeInfo != null)
+                TxtMatchedExeInfo.Text = "";
+        }
+
+        /// <summary>更新选中文件夹内匹配的EXE名称及版本号显示</summary>
+        private void UpdateMatchedExeInfoText()
+        {
+            if (TxtMatchedExeInfo == null) return;
+
+            if (_currentMatchedInfos == null || _currentMatchedInfos.Count == 0)
+            {
+                TxtMatchedExeInfo.Text = "";
+                return;
+            }
+
+            var distinctExes = _currentMatchedInfos
+                .GroupBy(m => m.ExeName)
+                .Select(g => new
+                {
+                    ExeName = g.Key,
+                    Version = g.First().FileVersion,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            if (distinctExes.Count == 1)
+            {
+                var exe = distinctExes[0];
+                TxtMatchedExeInfo.Text = $"EXE: {exe.ExeName}  版本: V{exe.Version}";
+            }
+            else
+            {
+                var lines = distinctExes.Select(e => $"EXE: {e.ExeName}  版本: V{e.Version}");
+                //TxtMatchedExeInfo.Text = "找到 " + distinctExes.Count + " 个程序:"  + string.Join("", lines);
+                TxtMatchedExeInfo.Text = "找到 " + distinctExes.Count + " 个程序："
+    + Environment.NewLine
+    + string.Join(Environment.NewLine, lines);
+            }
         }
 
         /// <summary>"修正文件夹命名"按钮点击</summary>
@@ -920,7 +1090,6 @@ namespace UpdateSoftware.Pages
         private void BtnCreateShortcut_Click(object sender, RoutedEventArgs e)
         {
             if (!_isInitialized) return;
-            if (!RequireAuth()) return;
 
             if (string.IsNullOrWhiteSpace(_currentSelectedFolderPath) || _currentMatchedInfos.Count == 0)
             {
@@ -950,18 +1119,87 @@ namespace UpdateSoftware.Pages
             // 显示重命名目标
             string targetName = item.MatchedConfig.ShortcutNamingRule.Replace("{版本号}", item.FileVersion);
             string sourceName = new DirectoryInfo(_currentSelectedFolderPath).Name;
-            string desktopPath = TxtDesktopPath?.Text;
-            if (string.IsNullOrWhiteSpace(desktopPath))
-                desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string fullShortcutPath = System.IO.Path.Combine(desktopPath, $"{targetName}.lnk");
+
+            // 根据选择的模式确定快捷方式创建路径
+            string destPath;
+            if (_useRemoteShortcutPath)
+            {
+                // 使用访问主机地址 → 取参数设定表格中的「发送快捷方式地址」
+                destPath = item.MatchedConfig.ShortcutDestPath;
+                if (string.IsNullOrWhiteSpace(destPath))
+                {
+                    MessageBox.Show("所选程序的参数配置中「发送快捷方式地址」为空，请先在参数设定页面填写。",
+                        "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+            else
+            {
+                // 使用本机地址 → TxtDesktopPath 文本框
+                destPath = TxtDesktopPath?.Text;
+                if (string.IsNullOrWhiteSpace(destPath))
+                    destPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            }
+            string fullShortcutPath = System.IO.Path.Combine(destPath, $"{targetName}.lnk");
 
             var result = MessageBox.Show(
-                $"当前文件夹: {sourceName}\n创建位置: {desktopPath}\n快捷方式名: {targetName}.lnk\n\n确认创建？",
+                $"当前文件夹: {sourceName}\n创建位置: {destPath}\n快捷方式名: {targetName}.lnk\n\n确认创建？",
                 "创建快捷方式", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
+                // 如果勾选了「删除旧版」，则先删除旧的快捷方式
+                if (ChkDeleteOldShortcut.IsChecked == true)
+                {
+                    DeleteOldShortcut(item.MatchedConfig, item.FileVersion);
+                }
                 CreateShortcut(item.MatchedConfig, item.FileVersion);
+            }
+        }
+
+        /// <summary>删除旧的快捷方式（删除目标目录下所有符合命名规则的 .lnk 文件）</summary>
+        private void DeleteOldShortcut(ParamConfigItem config, string version)
+        {
+            try
+            {
+                // 根据选择的模式确定目标目录
+                string destPath;
+                if (_useRemoteShortcutPath)
+                {
+                    destPath = config.ShortcutDestPath;
+                    if (string.IsNullOrWhiteSpace(destPath))
+                        return;
+                }
+                else
+                {
+                    destPath = TxtDesktopPath?.Text;
+                    if (string.IsNullOrWhiteSpace(destPath))
+                        destPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                }
+
+                if (!Directory.Exists(destPath))
+                    return;
+
+                // 获取命名规则前缀（去掉 {版本号} 占位符及其后面内容，取前缀部分）
+                int placeholderIndex = config.ShortcutNamingRule.IndexOf("{版本号}");
+                if (placeholderIndex < 0)
+                    return;
+
+                string prefix = config.ShortcutNamingRule.Substring(0, placeholderIndex);
+                // 列出目标目录下所有 .lnk 文件，删除以该前缀开头的文件
+                var allLnkFiles = Directory.GetFiles(destPath, "*.lnk", SearchOption.TopDirectoryOnly);
+                foreach (var shortcut in allLnkFiles)
+                {
+                    string fileName = System.IO.Path.GetFileNameWithoutExtension(shortcut);
+                    if (fileName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Delete(shortcut);
+                    }
+                }
+            }
+            catch
+            {
+                // 删除旧快捷方式失败时静默处理，不影响后续创建
             }
         }
 
@@ -988,11 +1226,19 @@ namespace UpdateSoftware.Pages
                     return;
                 }
 
-                // 获取快捷方式目标路径
-                string desktopPath = TxtDesktopPath?.Text;
-                if (string.IsNullOrWhiteSpace(desktopPath))
+                // 获取快捷方式目标路径（根据选择的模式）
+                string desktopPath;
+                if (_useRemoteShortcutPath)
                 {
-                    desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                    desktopPath = config.ShortcutDestPath;
+                    if (string.IsNullOrWhiteSpace(desktopPath))
+                        return;
+                }
+                else
+                {
+                    desktopPath = TxtDesktopPath?.Text;
+                    if (string.IsNullOrWhiteSpace(desktopPath))
+                        desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 }
 
                 if (!Directory.Exists(desktopPath))
@@ -1033,7 +1279,6 @@ namespace UpdateSoftware.Pages
         private void BtnFixFolderName_Click(object sender, RoutedEventArgs e)
         {
             if (!_isInitialized) return;
-            if (!RequireAuth()) return;
 
             if (string.IsNullOrWhiteSpace(_currentSelectedFolderPath) || _currentMatchedInfos.Count == 0)
             {
@@ -1044,7 +1289,7 @@ namespace UpdateSoftware.Pages
             var distinctExes = _currentMatchedInfos.Select(m => m.ExeName).Distinct().ToList();
             if (distinctExes.Count > 1)
             {
-                MessageBox.Show("此文件夹内存在多个不同EXE程序，请先使用\"修正文件夹命名\"按钮处理。",
+                MessageBox.Show("此文件夹内存在多个不同EXE程序，请使用\"修正文件夹命名\"按钮处理。",
                     "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -1052,7 +1297,7 @@ namespace UpdateSoftware.Pages
             // 检查是否有无法判断工位的
             if (_currentMatchedInfos.Any(m => m.MatchedConfig == null))
             {
-                MessageBox.Show("当前文件夹无法判断所属工位（上级文件夹名不含阴阳信息），请先使用\"修正文件夹命名\"按钮处理。",
+                MessageBox.Show("当前文件夹无法判断所属工位（上级文件夹名不含阴阳信息），请使用\"修正文件夹命名\"按钮处理。",
                     "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -1799,53 +2044,6 @@ namespace UpdateSoftware.Pages
             }
         }
 
-        /// <summary>保存新设备配置到文件（保存到合并的 JSON）</summary>
-        private void SaveDeviceConfigToFile()
-        {
-            try
-            {
-                string configDir = System.IO.Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory, "KB_ToolsBox_Config", "UpdateEXE");
-                Directory.CreateDirectory(configDir);
-                string filePath = System.IO.Path.Combine(configDir, "Prpgram.json");
-
-                // 读取已有的参数配置，合并设备配置后一同保存
-                object existingParamItems = null;
-                if (System.IO.File.Exists(filePath))
-                {
-                    try
-                    {
-                        string existingJson = System.IO.File.ReadAllText(filePath);
-                        var existing = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(existingJson);
-                        if (existing != null && existing.TryGetValue("ParamConfigItems", out object p))
-                            existingParamItems = p;
-                    }
-                    catch { }
-                }
-
-                var combined = new Dictionary<string, object>
-                {
-                    ["ParamConfigItems"] = existingParamItems ?? _paramConfigItems.Select(p => new
-                    {
-                        p.StationFolderPattern,
-                        p.ExeNamePattern,
-                        p.FolderNamingRule,
-                        p.ShortcutNamingRule,
-                        p.RemoteAccount,
-                        p.RemotePassword,
-                        p.RemotePath
-                    }).ToList(),
-                    ["DeviceConfigRows"] = _deviceConfigRows.ToList()
-                };
-
-                string json = Newtonsoft.Json.JsonConvert.SerializeObject(combined, Newtonsoft.Json.Formatting.Indented);
-                System.IO.File.WriteAllText(filePath, json);
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
         /// <summary>添加行</summary>
         private void BtnDeviceAddRow_Click(object sender, RoutedEventArgs e)
         {
@@ -2043,7 +2241,6 @@ namespace UpdateSoftware.Pages
                         }
                         string statusSuffix = usePrefix ? $" [设备号: {deviceNumber}]" : "";
                         TxtStatusBar.Text = $"目录创建完成: 成功 {finalSuccess}, 失败 {finalFail}{statusSuffix}";
-                        SaveDeviceConfigToFile();
                     }));
                 });
             }
@@ -2229,7 +2426,6 @@ namespace UpdateSoftware.Pages
         private void BtnSaveConfig_Click(object sender, RoutedEventArgs e)
         {
             if (!_isInitialized) return;
-            if (!RequireAuth()) return;
 
             try
             {
@@ -2251,18 +2447,26 @@ namespace UpdateSoftware.Pages
                         p.ExeNamePattern,
                         p.FolderNamingRule,
                         p.ShortcutNamingRule,
+                        p.ShortcutDestPath,
                         p.RemoteAccount,
                         p.RemotePassword,
                         p.RemotePath
                     }).ToList(),
                     DeviceConfigRows = _deviceConfigRows?.ToList(),
                     LogDirectoryPath = _logDirectoryPath,
-                    ConfigFilePath = _configFilePath
+                    ConfigFilePath = _configFilePath,
+                    UseRemoteShortcutPath = _useRemoteShortcutPath,
+                    DeleteOldShortcut = ChkDeleteOldShortcut.IsChecked == true
                 };
 
                 string json = Newtonsoft.Json.JsonConvert.SerializeObject(combined, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(_configFilePath, json);
+
+                // 在 %APPDATA% 保存指针，记录配置文件路径
+                SaveConfigPointer();
+
                 TxtStatusBar.Text = $"参数已保存到: {_configFilePath}";
+                MessageBox.Show(TxtStatusBar.Text, "保存参数成功", MessageBoxButton.OK, MessageBoxImage.None);
             }
             catch (Exception ex)
             {
@@ -2273,7 +2477,6 @@ namespace UpdateSoftware.Pages
         private void BtnLoadConfig_Click(object sender, RoutedEventArgs e)
         {
             if (!_isInitialized) return;
-            if (!RequireAuth()) return;
 
             try
             {
@@ -2296,49 +2499,11 @@ namespace UpdateSoftware.Pages
                         var combined = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                         if (combined != null && combined.Count > 0)
                         {
-                            // 加载参数配置
-                            if (combined.TryGetValue("ParamConfigItems", out object paramObj) && paramObj != null)
-                            {
-                                string paramJson = paramObj.ToString();
-                                var loadedParams = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ParamConfigItem>>(paramJson);
-                                if (loadedParams != null)
-                                {
-                                    _paramConfigItems.Clear();
-                                    foreach (var item in loadedParams)
-                                        _paramConfigItems.Add(item);
-                                }
-                            }
+                            // 加载前先设置文件路径，LoadConfigFromJson 会覆盖
+                            _configFilePath = loadedFilePath;
+                            TxtConfigPath.Text = _configFilePath;
 
-                            // 加载设备配置
-                            if (combined.TryGetValue("DeviceConfigRows", out object devObj) && devObj != null)
-                            {
-                                string devJson = devObj.ToString();
-                                var loadedDevices = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DeviceConfigRow>>(devJson);
-                                if (loadedDevices != null && loadedDevices.Count > 0)
-                                {
-                                    _deviceConfigRows.Clear();
-                                    foreach (var item in loadedDevices)
-                                        _deviceConfigRows.Add(item);
-                                }
-                            }
-
-                            // 加载路径设置
-                            if (combined.TryGetValue("LogDirectoryPath", out object logObj) && logObj != null)
-                            {
-                                _logDirectoryPath = logObj.ToString();
-                                TxtLogPath.Text = _logDirectoryPath;
-                            }
-                            if (combined.TryGetValue("ConfigFilePath", out object cfgObj) && cfgObj != null)
-                            {
-                                _configFilePath = cfgObj.ToString();
-                                TxtConfigPath.Text = _configFilePath;
-                            }
-                            else
-                            {
-                                _configFilePath = loadedFilePath;
-                                TxtConfigPath.Text = _configFilePath;
-                            }
-
+                            LoadConfigFromJson(combined);
                             TxtStatusBar.Text = $"配置已加载: {loadedFilePath}";
                             return;
                         }
@@ -2383,7 +2548,18 @@ namespace UpdateSoftware.Pages
                 ("工位3", "IVision_EVSR.exe"),
                 ("工位4", "IVision_EVSR.exe"),
             };
+            var shortcutDestPath = new[]
+            {
+                @"\\192.168.250.31\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.31\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.32\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.32\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.35\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.36\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.37\C$\Users\YBSJ-CL01\Desktop",
+                @"\\192.168.250.38\C$\Users\YBSJ-CL01\Desktop",
 
+            };
             const string remoteAccount = @"CATLBATTERY\YBSJ-CL01";
             const string remotePassword = "Aa147.258";
             var remotePaths = new[]
@@ -2424,8 +2600,153 @@ namespace UpdateSoftware.Pages
                     ShortcutNamingRule = $"{station} - V{{版本号}}",
                     RemoteAccount = remoteAccount,
                     RemotePassword = remotePassword,
-                    RemotePath = remotePaths[i]
+                    RemotePath = remotePaths[i],
+                    ShortcutDestPath = shortcutDestPath[i]
                 });
+            }
+        }
+
+        /// <summary>启动时自动加载配置</summary>
+        private void AutoLoadDefaultConfig()
+        {
+            try
+            {
+                // 先从 %APPDATA% 指针文件读取自定义配置文件路径
+                string configPath = DefaultConfigPath;
+                if (System.IO.File.Exists(AppDataConfigPointer))
+                {
+                    try
+                    {
+                        string pointerJson = File.ReadAllText(AppDataConfigPointer);
+                        var pointer = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(pointerJson);
+                        if (pointer != null && pointer.TryGetValue("ConfigFilePath", out object p) && p != null)
+                        {
+                            string savedPath = p.ToString();
+                            if (!string.IsNullOrWhiteSpace(savedPath) && System.IO.File.Exists(savedPath))
+                            {
+                                configPath = savedPath;
+                                _configFilePath = savedPath;
+                                TxtConfigPath.Text = _configFilePath;
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!System.IO.File.Exists(configPath)) return;
+
+                string json = File.ReadAllText(configPath);
+
+                // 尝试解析新格式（合并后的 JSON）
+                try
+                {
+                    var combined = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                    if (combined != null && combined.Count > 0)
+                    {
+                        LoadConfigFromJson(combined);
+                        TxtStatusBar.Text = $"已自动加载配置: {configPath}";
+                        return;
+                    }
+                }
+                catch { }
+
+                // 兼容旧格式（只有参数配置的列表）
+                var loadedItems = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ParamConfigItem>>(json);
+                if (loadedItems != null && loadedItems.Count > 0)
+                {
+                    _paramConfigItems.Clear();
+                    foreach (var item in loadedItems)
+                        _paramConfigItems.Add(item);
+                }
+            }
+            catch { }
+        }
+
+        /// <summary>保存配置路径指针到 %APPDATA%</summary>
+        private void SaveConfigPointer()
+        {
+            try
+            {
+                string dir = System.IO.Path.GetDirectoryName(AppDataConfigPointer);
+                if (!string.IsNullOrEmpty(dir))
+                    Directory.CreateDirectory(dir);
+                var pointer = new Dictionary<string, object> { ["ConfigFilePath"] = _configFilePath };
+                string json = Newtonsoft.Json.JsonConvert.SerializeObject(pointer, Newtonsoft.Json.Formatting.Indented);
+                File.WriteAllText(AppDataConfigPointer, json);
+            }
+            catch { }
+        }
+
+        /// <summary>删除配置路径指针</summary>
+        private void DeleteConfigPointer()
+        {
+            try
+            {
+                if (System.IO.File.Exists(AppDataConfigPointer))
+                    System.IO.File.Delete(AppDataConfigPointer);
+            }
+            catch { }
+        }
+
+        /// <summary>从反序列化的 JSON 对象中加载各项配置</summary>
+        private void LoadConfigFromJson(Dictionary<string, object> combined)
+        {
+            // 加载参数配置
+            if (combined.TryGetValue("ParamConfigItems", out object paramObj) && paramObj != null)
+            {
+                string paramJson = paramObj.ToString();
+                var loadedParams = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ParamConfigItem>>(paramJson);
+                if (loadedParams != null && loadedParams.Count > 0)
+                {
+                    _paramConfigItems.Clear();
+                    foreach (var item in loadedParams)
+                        _paramConfigItems.Add(item);
+                }
+            }
+
+            // 加载设备配置（同步更新表格）
+            if (combined.TryGetValue("DeviceConfigRows", out object devObj) && devObj != null)
+            {
+                string devJson = devObj.ToString();
+                var loadedDevices = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DeviceConfigRow>>(devJson);
+                if (loadedDevices != null && loadedDevices.Count > 0)
+                {
+                    _deviceConfigRows.Clear();
+                    foreach (var item in loadedDevices)
+                        _deviceConfigRows.Add(item);
+                }
+            }
+
+            // 加载路径设置
+            if (combined.TryGetValue("LogDirectoryPath", out object logObj) && logObj != null)
+            {
+                _logDirectoryPath = logObj.ToString();
+                TxtLogPath.Text = _logDirectoryPath;
+            }
+            if (combined.TryGetValue("ConfigFilePath", out object cfgObj) && cfgObj != null)
+            {
+                string savedPath = cfgObj.ToString();
+                if (!string.IsNullOrWhiteSpace(savedPath))
+                {
+                    _configFilePath = savedPath;
+                    TxtConfigPath.Text = _configFilePath;
+                }
+            }
+
+            // 加载快捷方式创建模式
+            if (combined.TryGetValue("UseRemoteShortcutPath", out object scModeObj) && scModeObj != null)
+            {
+                bool.TryParse(scModeObj.ToString(), out _useRemoteShortcutPath);
+                RbtnRemoteShortcut.IsChecked = _useRemoteShortcutPath;
+                RbtnLocalShortcut.IsChecked = !_useRemoteShortcutPath;
+            }
+
+            // 加载删除旧版快捷方式设置
+            if (combined.TryGetValue("DeleteOldShortcut", out object delObj) && delObj != null)
+            {
+                bool delVal = false;
+                bool.TryParse(delObj.ToString(), out delVal);
+                ChkDeleteOldShortcut.IsChecked = delVal;
             }
         }
 
@@ -2791,6 +3112,28 @@ namespace UpdateSoftware.Pages
             }
         }
 
+        /// <summary>拖拽文件夹到新版本统一存放路径输入框</summary>
+        private void TxtSmartSourcePath_PreviewDragOver(object sender, System.Windows.DragEventArgs e)
+        {
+            e.Effects = e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop) ? System.Windows.DragDropEffects.Copy : System.Windows.DragDropEffects.None;
+            e.Handled = true;
+        }
+
+        private void TxtSmartSourcePath_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                var files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+                if (files != null && files.Length > 0 && Directory.Exists(files[0]))
+                {
+                    TxtSmartSourcePath.Text = files[0];
+                    _smartSourcePath = files[0];
+                    TxtStatusBar.Text = $"新版本源路径已设置: {_smartSourcePath}";
+                }
+            }
+            e.Handled = true;
+        }
+
         /// <summary>扫描模式切换：远程 / 本机测试</summary>
         private void RbtnSmartScanMode_Checked(object sender, RoutedEventArgs e)
         {
@@ -2829,6 +3172,16 @@ namespace UpdateSoftware.Pages
             {
                 MessageBox.Show("请先设置有效的新版本统一存放路径。", "路径未设置",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
+                TogSmartWatch.IsChecked = false;
+                return;
+            }
+
+            // 校验设备号
+            if (ChkUseDevicePrefix?.IsChecked == true && string.IsNullOrWhiteSpace(TxtDeviceNumber?.Text?.Trim()))
+            {
+                MessageBox.Show("已勾选「启用设备号」，请先填写设备号！", "设备号为空",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                TxtDeviceNumber.Focus();
                 TogSmartWatch.IsChecked = false;
                 return;
             }
@@ -3029,6 +3382,25 @@ namespace UpdateSoftware.Pages
                     {
                         if (item.StatusText == "更新成功" || item.StatusText == "success")
                         {
+                            // 如果勾选了「删除旧版」，先删除旧的快捷方式
+                            if (ChkDeleteOldShortcut?.IsChecked == true && item.MatchedConfig != null)
+                            {
+                                string ver = item.NewVersion;
+                                if (string.IsNullOrWhiteSpace(ver))
+                                {
+                                    try
+                                    {
+                                        string folderPath = System.IO.Path.Combine(item.RemotePath,
+                                            item.MatchedConfig.FolderNamingRule?.Replace("{版本号}", item.NewVersion) ?? "");
+                                        string exe = Directory.GetFiles(folderPath, item.ExeName, SearchOption.TopDirectoryOnly).FirstOrDefault();
+                                        if (exe != null)
+                                            ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(exe).FileVersion;
+                                    }
+                                    catch { }
+                                }
+                                if (!string.IsNullOrWhiteSpace(ver))
+                                    DeleteOldShortcut(item.MatchedConfig, ver);
+                            }
                             CreateShortcutForUpdatedItem(item);
                         }
                     }
@@ -3095,11 +3467,15 @@ namespace UpdateSoftware.Pages
 
             string capturedLocalRoot = localRoot;
             bool usePrefix = ChkUseDevicePrefix.IsChecked == true;
-            string devicePrefix = usePrefix ? TxtDeviceNumber.Text.Trim() + "#" : null;
             if (usePrefix && string.IsNullOrWhiteSpace(TxtDeviceNumber.Text.Trim()))
             {
-                devicePrefix = null; // 设备号为空时视为未启用
+                MessageBox.Show("已勾选「启用设备号」，请先填写设备号！", "设备号为空",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                TxtDeviceNumber.Focus();
+                BtnSmartScanAll.IsEnabled = true;
+                return;
             }
+            string devicePrefix = usePrefix ? TxtDeviceNumber.Text.Trim() + "#" : null;
             string capturedPrefix = devicePrefix;
             try
             {
@@ -3573,6 +3949,25 @@ namespace UpdateSoftware.Pages
                 {
                     if (item.StatusText == "更新成功" || item.StatusText == "success")
                     {
+                        // 如果勾选了「删除旧版」，先删除旧的快捷方式
+                        if (ChkDeleteOldShortcut?.IsChecked == true && item.MatchedConfig != null)
+                        {
+                            string ver = item.NewVersion;
+                            if (string.IsNullOrWhiteSpace(ver))
+                            {
+                                try
+                                {
+                                    string folderPath = System.IO.Path.Combine(item.RemotePath,
+                                        item.MatchedConfig.FolderNamingRule?.Replace("{版本号}", item.NewVersion) ?? "");
+                                    string exe = Directory.GetFiles(folderPath, item.ExeName, SearchOption.TopDirectoryOnly).FirstOrDefault();
+                                    if (exe != null)
+                                        ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(exe).FileVersion;
+                                }
+                                catch { }
+                            }
+                            if (!string.IsNullOrWhiteSpace(ver))
+                                DeleteOldShortcut(item.MatchedConfig, ver);
+                        }
                         CreateShortcutForUpdatedItem(item);
                     }
                 }
@@ -3729,20 +4124,18 @@ namespace UpdateSoftware.Pages
                     .FirstOrDefault();
                 if (exePath == null) return;
 
-                // 快捷方式命名：EXE程序名 - V版本号（从文件属性读取）
-                string exeNameOnly = System.IO.Path.GetFileNameWithoutExtension(exePath);
-                string fileVersion = item.NewVersion;
-                // 如果 NewVersion 为空，尝试从文件属性读取
-                if (string.IsNullOrWhiteSpace(fileVersion))
+                // 快捷方式命名：使用参数配置表中的 ShortcutNamingRule（与"为所选程序创建快捷方式"保持一致）
+                string version = item.NewVersion;
+                if (string.IsNullOrWhiteSpace(version))
                 {
                     try
                     {
                         var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(exePath);
-                        fileVersion = vi.FileVersion;
+                        version = vi.FileVersion;
                     }
                     catch { }
                 }
-                string shortcutName = $"{exeNameOnly} - V{fileVersion}";
+                string shortcutName = item.MatchedConfig.ShortcutNamingRule.Replace("{版本号}", version);
 
                 // 确定快捷方式存放目录：优先用参数配置中的「发送快捷方式地址」
                 string destDir = item.MatchedConfig.ShortcutDestPath;

@@ -17,16 +17,12 @@ namespace UpdateSoftware
         private static string SettingsFilePath =>
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UpdateSoftware_Config", SettingsFileName);
 
-        /// <summary>从文件加载设置</summary>
+        /// <summary>从文件加载设置（仅在文件存在时读取，不创建目录）</summary>
         public static AppSettings Load()
         {
             try
             {
                 var path = SettingsFilePath;
-                var dir = Path.GetDirectoryName(path);
-                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-
                 if (File.Exists(path))
                 {
                     var json = File.ReadAllText(path);

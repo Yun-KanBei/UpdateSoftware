@@ -3,6 +3,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace UpdateSoftware
 {
@@ -16,7 +18,7 @@ namespace UpdateSoftware
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             Closed += MainWindow_Closed;
-            // 在窗口显示前先加载页面，避免白屏
+            // 在构造函数中加载页面，确保 ContentRendered 时页面已就绪
             MainFrame.Navigate(new Pages.UpdateEXE());
         }
 
@@ -158,5 +160,46 @@ namespace UpdateSoftware
                 _notifyIcon = null;
             }
         }
+
+        // ============ 自定义标题栏事件 ============
+
+        /// <summary>标题栏双击 → 切换最大化/还原</summary>
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                ToggleMaximize();
+            }
+        }
+
+        /// <summary>标题栏右键 → 系统菜单</summary>
+        private void TitleBar_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            SystemCommands.ShowSystemMenu(this, PointToScreen(e.GetPosition(this)));
+        }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleMaximize();
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void ToggleMaximize()
+        {
+            WindowState = WindowState == WindowState.Maximized
+                ? WindowState.Normal
+                : WindowState.Maximized;
+        }
+
+
     }
 }
